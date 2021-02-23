@@ -31,6 +31,6 @@ dat <- read_sheet(url) %>%
 				 wasser = as.numeric(wasser)
 				 )
 
-write_csv2(x=dat, path=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))
+write_csv(x=dat, path=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))
 }
 

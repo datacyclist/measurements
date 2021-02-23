@@ -30,6 +30,7 @@ library(dplyr)
 library(googlesheets4)
 library(lubridate)
 library(reshape2)
+library(readr)
 
 source("theme-verbrauch.R")
 source("05-read-googlesheet.R")
@@ -40,7 +41,7 @@ figdirprefix <- 'figs/'
 cachedirprefix <- 'cache/'
 
 
-dat <- read_csv2(file=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))
+dat <- read_csv(file=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))
 
 df <- dat %>%
 	mutate(
