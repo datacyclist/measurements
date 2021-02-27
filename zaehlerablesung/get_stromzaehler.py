@@ -11,7 +11,22 @@ import httplib, urllib
 import pytz
 # import bme280
 
+#########################################
 # dieses Script wird in einem systemd-service gestartet
+########################################
+# Anlegen des Services 'stromzaehler.service' in /lib/systemd/system
+# 
+# [Unit]
+# Description=Stromzaehler-Logger
+# After=multi-user.target
+# 
+# [Service]
+# ExecStart=/usr/bin/python /home/russ/bin/zaehler/get_stromzaehler.py
+# 
+# [Install]
+# WantedBy=multi-user.target
+########################################
+
 
 def append_new_line(file_name, text_to_append):
     """Append given text as a new line at the end of file"""
@@ -26,10 +41,6 @@ def append_new_line(file_name, text_to_append):
             file_object.write(text_to_append)
             # append newline
             file_object.write("\n")
-
-############################
-# 
-############################
 
 import RPi.GPIO as GPIO
 
@@ -63,13 +74,23 @@ for i in range(5):
 
 tz = pytz.timezone('Europe/Zurich')
 
+
+########################################
+# Endlosschleife fuers Datenloggen (eine Zeile ins CSV pro LED-blink, ein CSV
+# pro Tag, muss für Weiterverarbeitung z.B. per cronjob und rsync abgeholt
+# werden:
+#
+# z.B. so in crontab (alle fuenf Minuten)
+# */5 * * * * rsync --update /var/tmp/*strom* /home/russ/mnt/nas/zaehlerlog/
+########################################
+
 while True:
     if GPIO.input(18) == 1:
         # LED Ausschalten
         GPIO.output(26, GPIO.LOW)
         c=1
     else:
-        # LED Einschalten
+        # LED Einschalten, blinkt also kurz, wenn Zaehler-LED blinkt
         GPIO.output(26, GPIO.HIGH)
 #        time.sleep(0.2)
         while(c>0):
@@ -80,38 +101,3 @@ while True:
             print(sttime)
             append_new_line('/var/tmp/'+filenamedate+'-stromzaehler-ping.csv', sttime+',1')
 
-        #log='/var/tmp/test.txt'
-        #with open(log, 'a') as logfile:
-        #    logfile.write("\n")
-        #    logfile.write(sttime + ' 1')
-
-# (chip_id, chip_version) = bme280.readBME280ID(      )
-# print "Chip ID :", chip_id
-# print "Version :", chip_version
-
-# bmp280temperature,bmp280pressure,bmp280humidity = bme280.readBME280All()
-
-#bmp280pressureshort = str(round(float(bmp280pressure),1))
-#bmp280humidityshort = str(round(float(bmp280humidity),1))
-
-# print "Temperature : ", bmp280temperature, "C"
-# print "Pressure : ", bmp280pressure, "hPa"
-# print "Pressure short : ", bmp280pressureshort, "hPa"
-# print "Humidity : ", bmp280humidity, "%"
-# print "Humidity short : ", bmp280humidityshort, "%"
-
-##############################
-# alles in Files ablegen
-##############################
-
-#ftempbmp = open('/var/tmp/bmp280_temperature', 'w')	
-#ftempbmp.write(str(bmp280temperature))
-#ftempbmp.close()
-#
-#fpressbmp = open('/var/tmp/bmp280_pressure', 'w')	
-#fpressbmp.write(str(bmp280pressureshort))
-#fpressbmp.close()
-#
-#fhumbmp = open('/var/tmp/bmp280_humidity', 'w')	
-#fhumbmp.write(str(bmp280humidityshort))
-#fhumbmp.close()
