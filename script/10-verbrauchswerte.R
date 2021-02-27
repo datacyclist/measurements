@@ -1,3 +1,4 @@
+
 library(tidyverse)
 library(ggplot2)
 library(gridExtra)
@@ -174,6 +175,8 @@ kostenplot <- ggplot(dfplot2) +
 	annotate("text", x=min(dfplot2$datum), y=900, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
 	annotate("text", x=min(dfplot2$datum), y=850, hjust=0, cex=5, label='- Grundpreise nur bei vollständigen Monaten korrekt') +
 	scale_y_continuous(limits=c(0,1000)) +
+	#scale_fill_brewer(type='qual') +
+	scale_fill_brewer(type='div') +
 	theme_verbrauch() +
 	labs(title="Kosten Energie/Wasser OD10 im Zeitverlauf",
 	     y = 'Rp. pro Tag',
