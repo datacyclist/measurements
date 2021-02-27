@@ -62,6 +62,7 @@ df1 <- datedf %>%
 dfplot <- df1 %>%
 		select(datum, abgelesen_flag, starts_with('verbrauch')) %>%
 		melt(id.vars=c('datum', 'abgelesen_flag')) %>%
+		filter(variable != 'verbrauch_strom_gesamt_pro_tag') %>%	
 		#filter(!(is.na(value))) %>%
 		mutate(group = case_when(
 														 grepl('strom',variable) ~ 'Strom [kWh]',
@@ -73,8 +74,9 @@ dfplot <- df1 %>%
 		)
 
 verbrauchsplot <- ggplot(dfplot) +
-	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='dodge', size=0.3) +
+	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
 	scale_colour_identity() +
+	scale_fill_brewer(type='qual', direction=1) +
 	facet_wrap(~group, ncol=1, scales='free_y') +
 	theme_verbrauch() +
 	labs(title="Verbrauchswerte OD10 im Zeitverlauf",
