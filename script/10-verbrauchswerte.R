@@ -104,6 +104,7 @@ df1_monate <- df1 %>%
 dfplot1 <- df1_monate %>%
 		#select(JahrMonat, starts_with('verbrauch')) %>%
 		melt(id.vars=c('JahrMonat')) %>%
+		filter(variable != 'strom_ges_kWh') %>%
 		mutate(group = case_when(
 														 grepl('strom',variable) ~ 'Strom [kWh]',
 														 grepl('wasser', variable) ~ 'Wasser [Liter]',
@@ -113,9 +114,10 @@ dfplot1 <- df1_monate %>%
 		)
 
 verbrauchsplot1 <- ggplot(dfplot1) +
-	geom_col(aes(x=JahrMonat, y=value, group=variable, fill=variable), colour='black', position='dodge', size=0.3) +
+	geom_col(aes(x=JahrMonat, y=value, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
 	#scale_colour_identity() +
 	facet_wrap(~group, ncol=1, scales='free_y') +
+	scale_fill_brewer(type='qual', direction=-1) +
 	theme_verbrauch() +
 	theme(axis.text.x=element_text(angle=90)) +
 	labs(title="Verbrauchswerte OD10, Monate",
