@@ -8,8 +8,8 @@
 #source("theme-verbrauch.R")
 
 filedateprefix <- format(Sys.time(), "%Y%m%d")
-figdirprefix <- 'figs/'
-cachedirprefix <- 'cache/'
+figdirprefix <- '../figs/'
+cachedirprefix <- '../cache/'
 
 library(tidyverse)
 library(googlesheets4)

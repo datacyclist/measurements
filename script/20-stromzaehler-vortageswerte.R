@@ -2,6 +2,7 @@
 #
 # liegen in CSV-Files, eins pro Tag, pro Zeile ein Timestamp und pro Zeile eine Wh
 #
+# 20200227, Georg Russ
 
 library(tidyverse)
 library(ggplot2)
@@ -21,8 +22,8 @@ source("theme-verbrauch.R")
 options("digits.secs"=6)
 
 filedateprefix <- format(Sys.time(), "%Y%m%d")
-figdirprefix <- 'figs/'
-cachedirprefix <- 'cache/'
+figdirprefix <- '../figs/'
+cachedirprefix <- '../cache/'
 
 # Daten vom NAS holen, alle CSVs in einem bestimmten Verzeichnis
 dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*.csv", full.names=TRUE) %>%

@@ -4,6 +4,8 @@
 # liegen in CSV-Files, eins pro Tag, pro Zeile ein Timestamp und pro Zeile eine Wh
 #
 # Hier nur Werte der letzten 24h berechnen (Energie auf Stundenbasis und Leistungskurve)
+#
+# 20200227, Georg Russ
 #########################################
 
 library(tidyverse)
@@ -24,8 +26,8 @@ source("theme-verbrauch.R")
 #source("08-grundpreise.R")
 
 filedateprefix <- format(Sys.time(), "%Y%m%d")
-figdirprefix <- 'figs/'
-cachedirprefix <- 'cache/'
+figdirprefix <- '../figs/'
+cachedirprefix <- '../cache/'
 
 currenttime <- Sys.time()
 

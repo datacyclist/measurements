@@ -1,27 +1,3 @@
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# \documentclass[10pt,a4paper]{article}
-# \usepackage[german]{babel}
-# \usepackage{mathpazo}
-# \renewcommand{\sfdefault}{lmss}
-# \renewcommand{\ttdefault}{lmtt}
-# \usepackage[T1]{fontenc}
-# \usepackage[utf8]{inputenc}
-# \usepackage{geometry}
-# \geometry{verbose,tmargin=2.0cm,bmargin=2.0cm,lmargin=2.0cm,rmargin=2.0cm}
-# \usepackage{url}
-# 
-# \author{Georg Russ}
-# \date{\today}
-# \title{Verbrauchs{\"u}bersicht Oberdorfstr. 10}
-# 
-# \begin{document}
-# \maketitle
-# 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# 
-# <<auswertung, echo=FALSE>>=
-#library(zoo)
-
 library(tidyverse)
 library(ggplot2)
 library(gridExtra)
@@ -37,8 +13,8 @@ source("05-read-googlesheet.R")
 source("08-grundpreise.R")
 
 filedateprefix <- format(Sys.time(), "%Y%m%d")
-figdirprefix <- 'figs/'
-cachedirprefix <- 'cache/'
+figdirprefix <- '../figs/'
+cachedirprefix <- '../cache/'
 
 
 dat <- read_csv(file=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))
