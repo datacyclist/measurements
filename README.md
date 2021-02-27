@@ -27,6 +27,10 @@ data is stored in this folder.
 Any figure output from R is put into this folder. Folder contents are not
 checked in.
 
+## script
+
+R scripts for data handling and graphics generation go in here.
+
 ## zaehlerablesung
 
 This stores the script(s) that are being run on the Raspberry Pi to get the
