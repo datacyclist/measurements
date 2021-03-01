@@ -34,16 +34,15 @@ df <- dat %>%
 				 verbrauch_strom_nt_pro_tag_kWh = diff_strom_nt/diff_h*24,
 				 verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh,
 				 timestamp_orig = timestamp,
-				 timestamp = lag(timestamp),
 				 datum = as.Date(timestamp_orig)
 				 )
 	# join with df to fill missing values
 	
 	datedf <- data.frame(datum=seq.Date(min(df$datum),max(df$datum),by="day")) %>%
-					mutate(JahrMonat = as.factor(format(datum, format = "%Y-%m"))) %>%
-					group_by(JahrMonat) %>%
-					mutate(tage_pro_monat = n()) %>%
-					ungroup()
+					mutate(
+								 JahrMonat = as.factor(format(datum, format = "%Y-%m")),
+								 tage_pro_monat = days_in_month(datum)
+								 )
 				
 
 ###############################
@@ -177,7 +176,7 @@ kostenplot <- ggplot(dfplot2) +
 	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
 	scale_colour_identity() +
 	annotate("text", x=min(dfplot2$datum), y=900, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
-	annotate("text", x=min(dfplot2$datum), y=850, hjust=0, cex=5, label='- Grundpreise nur bei vollständigen Monaten korrekt') +
+	annotate("text", x=min(dfplot2$datum), y=850, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
 	scale_y_continuous(limits=c(0,1000)) +
 	#scale_fill_brewer(type='qual') +
 	scale_fill_brewer(type='div') +
