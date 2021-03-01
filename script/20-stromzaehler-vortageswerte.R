@@ -25,13 +25,18 @@ filedateprefix <- format(Sys.time(), "%Y%m%d")
 figdirprefix <- '../figs/'
 cachedirprefix <- '../cache/'
 
-# Daten vom NAS holen, alle CSVs in einem bestimmten Verzeichnis
-dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*.csv", full.names=TRUE) %>%
-			map_df(~read_csv(.,col_names=FALSE))
+vortag <- format(Sys.time()-days(1), "%Y%m%d")
+dat_gestern <- read_csv(file=paste("/home/russ/mnt/nas/zaehlerlog/", vortag, '-stromzaehler-ping.csv', sep=""),
+								col_names=FALSE)
 
-df <- dat %>%
+## Daten vom NAS holen, alle CSVs in einem bestimmten Verzeichnis
+#dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*.csv", full.names=TRUE) %>%
+#			map_df(~read_csv(.,col_names=FALSE))
+
+df <- dat_gestern %>%
 	mutate(
-				 timestamp = X1,
+				 timestamp_utc = X1,
+				 timestamp = as.POSIXct(format(timestamp_utc, tz='Europe/Zurich')),
 				 Wh = X2,
 				 diff_h = interval(lag(timestamp),timestamp)/hours(1),
 				 diff_s = interval(lag(timestamp),timestamp)/hours(1)*3600,
