@@ -2,7 +2,7 @@
 #
 # liegen in CSV-Files, eins pro Tag, pro Zeile ein Timestamp und pro Zeile eine Wh
 #
-# 20200227, Georg Russ
+# 20210227, Georg Russ
 
 library(tidyverse)
 library(ggplot2)
@@ -20,6 +20,7 @@ source("theme-verbrauch.R")
 
 # für millisekundengenaue Berechnungen Anzahl Nachkommastellen anpassen
 options("digits.secs"=6)
+options("lubridate.week.start"=1)
 
 filedateprefix <- format(Sys.time(), "%Y%m%d")
 figdirprefix <- '../figs/'
@@ -42,6 +43,7 @@ df <- dat_gestern %>%
 				 diff_s = interval(lag(timestamp),timestamp)/hours(1)*3600,
 				 Leistung = Wh/diff_h
 				 )
+
 
 df_hours <- df %>%
 				mutate(
