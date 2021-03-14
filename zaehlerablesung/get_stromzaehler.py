@@ -64,9 +64,9 @@ GPIO.setup(26, GPIO.OUT)
 
 for i in range(5):
    GPIO.output(26, GPIO.HIGH)
-   time.sleep(0.2)
+   time.sleep(0.15)
    GPIO.output(26, GPIO.LOW)
-   time.sleep(0.1)
+   time.sleep(0.15)
 
 # Taster testen
 # input_13=GPIO.input(13)
@@ -98,6 +98,6 @@ while True:
             ts=time.time()
             sttime = datetime.fromtimestamp(ts,tz=tz).strftime('%Y-%m-%d %H:%M:%S.%f%z')
             filenamedate = datetime.fromtimestamp(ts).strftime('%Y%m%d')
-            print(sttime)
+#           print(sttime)
             append_new_line('/var/tmp/'+filenamedate+'-stromzaehler-ping.csv', sttime+',1')
 
