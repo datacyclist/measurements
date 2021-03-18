@@ -1,3 +1,15 @@
+########################################
+# Skript zum Generieren von Verbrauchs-/Kosten-grafiken
+# 
+# 2021-03-18
+#
+# - Zählerstände aus CSV
+# - Berechnen von Zeitdifferenzen und Zählerdifferenzen für diese Zeiträume
+# - alles in (künstlichen) Stundenintervallen
+# - später Aggregation auf Tagesbasis, Monatsbasis
+# - Kosten müssen pro Jahr separat angepasst werden (siehe 08-grundpreise.R)
+# 
+########################################
 
 library(tidyverse)
 library(ggplot2)
@@ -13,6 +25,8 @@ source("theme-verbrauch.R")
 source("05-read-googlesheet.R")
 source("08-grundpreise.R")
 
+options("lubridate.week.start"=1)
+
 filedateprefix <- format(Sys.time(), "%Y%m%d")
 figdirprefix <- '../figs/'
 cachedirprefix <- '../cache/'
@@ -20,43 +34,124 @@ cachedirprefix <- '../cache/'
 
 dat <- read_csv(file=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))
 
-df <- dat %>%
+##############################
+# Ablesetage bestimmen
+##############################
+
+df_abgelesen_logical <- dat %>%
+	arrange(timestamp) %>%
+	mutate(
+				 timestamp_day = format(timestamp, format = "%Y-%m-%d")
+				 ) %>%
+	select(timestamp_day) %>%
+	unique() %>% # bei mehrfachen Tagesablesungen
+	mutate(abgelesen_flag = TRUE)
+
+########################################
+# Daten vorbearbeiten und bereinigen -- auf Stundenbasis runterbrechen
+########################################
+
+#df <- dat %>%
+#	arrange(timestamp) %>%
+#	# nutze nur den letzten Messwert eines Tages (andere Zeilen rausfiltern)
+#	mutate(datum = as.Date(timestamp)) %>%
+#	group_by(datum) %>%
+#	filter(row_number() == n()) %>%
+#	ungroup() %>%
+#	# hier normal weiter
+#	mutate(
+#				 diff_h = interval(lag(timestamp),timestamp)/hours(1),
+#				 diff_gas = gas - lag(gas),
+#				 diff_wasser = wasser - lag(wasser),
+#				 diff_strom_ht = strom_tag-lag(strom_tag),
+#				 diff_strom_nt = strom_nacht-lag(strom_nacht),
+#				 #verbrauch_gas_pro_tag_m3 = diff_gas/diff_h*24,
+#				 verbrauch_gas_pro_tag_kWh = diff_gas/diff_h*24*10.17,
+#				 verbrauch_wasser_pro_tag_l = diff_wasser/diff_h*24*1000,
+#				 verbrauch_strom_ht_pro_tag_kWh = diff_strom_ht/diff_h*24,
+#				 verbrauch_strom_nt_pro_tag_kWh = diff_strom_nt/diff_h*24,
+#				 verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh,
+#				 timestamp_orig = timestamp
+#				 )
+
+df_hours <- dat %>%
+	arrange(timestamp) %>%
 	mutate(
 				 diff_h = interval(lag(timestamp),timestamp)/hours(1),
 				 diff_gas = gas - lag(gas),
 				 diff_wasser = wasser - lag(wasser),
 				 diff_strom_ht = strom_tag-lag(strom_tag),
 				 diff_strom_nt = strom_nacht-lag(strom_nacht),
-				 #verbrauch_gas_pro_tag_m3 = diff_gas/diff_h*24,
-				 verbrauch_gas_pro_tag_kWh = diff_gas/diff_h*24*10.17,
-				 verbrauch_wasser_pro_tag_l = diff_wasser/diff_h*24*1000,
-				 verbrauch_strom_ht_pro_tag_kWh = diff_strom_ht/diff_h*24,
-				 verbrauch_strom_nt_pro_tag_kWh = diff_strom_nt/diff_h*24,
-				 verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh,
-				 timestamp_orig = timestamp,
-				 datum = as.Date(timestamp_orig)
+				 verbrauch_gas_pro_stunde_kWh = diff_gas/diff_h*10.17,
+				 verbrauch_wasser_pro_stunde_l = diff_wasser/diff_h*1000,
+				 verbrauch_strom_ht_pro_stunde_kWh = diff_strom_ht/diff_h,
+				 verbrauch_strom_nt_pro_stunde_kWh = diff_strom_nt/diff_h,
+				 verbrauch_strom_gesamt_pro_stunde = verbrauch_strom_ht_pro_stunde_kWh + verbrauch_strom_nt_pro_stunde_kWh,
+				 timestamp_hours= format(timestamp, format = "%Y-%m-%d %H:00:00")
 				 )
-	# join with df to fill missing values
+
+# join with this datedf in hours to fill missing values
+df_hours_for_join <- data.frame(
+															 timestamp_hours = seq.POSIXt(as.POSIXct(min(df_hours$timestamp,na.rm=TRUE)), 
+																														as.POSIXct(max(df_hours$timestamp, na.rm=TRUE)), 
+																														by="hour")
+															 ) %>%
+	mutate(timestamp_hours = format(timestamp_hours, format="%Y-%m-%d %H:00:00"))
+
+# Alles auf Stundenbasis berechnen...
+df_hours_join <- df_hours_for_join %>%
+				left_join(df_hours, by='timestamp_hours') %>%
+	fill(verbrauch_gas_pro_stunde_kWh, .direction='up') %>%
+	fill(verbrauch_wasser_pro_stunde_l, .direction='up') %>%
+	fill(verbrauch_strom_nt_pro_stunde_kWh, .direction='up') %>%
+	fill(verbrauch_strom_ht_pro_stunde_kWh, .direction='up') %>%
+	fill(verbrauch_strom_gesamt_pro_stunde, .direction='up')
+
+# ...und wieder auf Tagesbasis aggregieren
+
+df_days <- df_hours_join %>%
+				mutate(
+							 timestamp_day = format(as.POSIXct(timestamp_hours, format = "%Y-%m-%d %H:%M:%S"), format="%Y-%m-%d")
+				) %>%
+	group_by(timestamp_day) %>%
+	summarise(
+						verbrauch_gas_pro_tag_kWh = sum(verbrauch_gas_pro_stunde_kWh, na.rm=TRUE),
+						verbrauch_wasser_pro_tag_l = sum(verbrauch_wasser_pro_stunde_l, na.rm=TRUE),
+						verbrauch_strom_ht_pro_tag_kWh = sum(verbrauch_strom_ht_pro_stunde_kWh, na.rm=TRUE),
+						verbrauch_strom_nt_pro_tag_kWh = sum(verbrauch_strom_nt_pro_stunde_kWh, na.rm=TRUE),
+						verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh) %>%
+	ungroup()  %>%
+	left_join(df_abgelesen_logical, by='timestamp_day') %>%
+	mutate(datum = as.POSIXct(format(timestamp_day, format="%Y-%m-%d"))) %>%
+	mutate(abgelesen_flag = replace_na(abgelesen_flag, FALSE))
 	
-	datedf <- data.frame(datum=seq.Date(min(df$datum),max(df$datum),by="day")) %>%
+########################################
+# Tage pro Monat -- nicht immer 30...
+# join with this datedf to fill missing values
+########################################
+
+df_datum_tage_pro_monat_join <- data.frame(datum=seq.Date(as.Date(min(df_days$datum)),as.Date(max(df_days$datum)),by="day")) %>%
 					mutate(
 								 JahrMonat = as.factor(format(datum, format = "%Y-%m")),
 								 tage_pro_monat = days_in_month(datum)
 								 )
-				
 
+# Tage pro Monat und Jahr-Monat dranhaengen
+df1 <- df_datum_tage_pro_monat_join %>%
+				left_join(df_days, by='datum') 
+	
 ###############################
 # Verbrauchswerte und Plot dazu
 ###############################
 
-df1 <- datedf %>%
-	left_join(df, by='datum') %>%
-	fill(verbrauch_gas_pro_tag_kWh, .direction='up') %>%
-	fill(verbrauch_wasser_pro_tag_l, .direction='up') %>%
-	fill(verbrauch_strom_nt_pro_tag_kWh, .direction='up') %>%
-	fill(verbrauch_strom_ht_pro_tag_kWh, .direction='up') %>%
-	fill(verbrauch_strom_gesamt_pro_tag, .direction='up') %>%
-	mutate(abgelesen_flag = ifelse(is.na(timestamp_orig), FALSE, TRUE))
+#df1 <- datedf %>%
+#	left_join(df, by='datum') %>%
+#	fill(verbrauch_gas_pro_tag_kWh, .direction='up') %>%
+#	fill(verbrauch_wasser_pro_tag_l, .direction='up') %>%
+#	fill(verbrauch_strom_nt_pro_tag_kWh, .direction='up') %>%
+#	fill(verbrauch_strom_ht_pro_tag_kWh, .direction='up') %>%
+#	fill(verbrauch_strom_gesamt_pro_tag, .direction='up') %>%
+#	mutate(abgelesen_flag = ifelse(is.na(timestamp_orig), FALSE, TRUE))
 
 dfplot <- df1 %>%
 		select(datum, abgelesen_flag, starts_with('verbrauch')) %>%
@@ -78,7 +173,7 @@ verbrauchsplot <- ggplot(dfplot) +
 	scale_fill_brewer(type='qual', direction=1) +
 	facet_wrap(~group, ncol=1, scales='free_y') +
 	theme_verbrauch() +
-	labs(title="Verbrauchswerte OD10 im Zeitverlauf",
+	labs(title=paste("Verbrauchswerte OD10 im Zeitverlauf, generiert ", filedateprefix, sep=""),
 	     y = 'Wert in jew. Einheit [l bzw. kWh]',
 			 x = 'Datum'
 			 )
@@ -119,13 +214,13 @@ verbrauchsplot1 <- ggplot(dfplot1) +
 	scale_fill_brewer(type='qual', direction=-1) +
 	theme_verbrauch() +
 	theme(axis.text.x=element_text(angle=90)) +
-	labs(title="Verbrauchswerte OD10, Monate",
+	labs(title=paste("Verbrauchswerte OD10, Monate, generiert ", filedateprefix, sep=""),
 	     y = 'Wert in jew. Einheit [l bzw. kWh]',
 			 x = 'Jahr-Monat'
 			 )
 
 png(filename=paste(figdirprefix, filedateprefix, "_verbrauchsverlauf_jahrmonat.png", sep=''),
-		width=600, height=700)
+		width=800, height=700)
  print(verbrauchsplot1)
 dev.off()
 
@@ -136,16 +231,17 @@ dev.off()
 
 # alles Bruttokosten, d.h. inkl. MWSt. (7.7% Gas/Strom, 2.5% Wasser)
 
-df2 <- datedf %>%
-	left_join(df, by='datum') %>%
-	fill(verbrauch_gas_pro_tag_kWh, .direction='up') %>%
-	fill(verbrauch_wasser_pro_tag_l, .direction='up') %>%
-	fill(verbrauch_strom_nt_pro_tag_kWh, .direction='up') %>%
-	fill(verbrauch_strom_ht_pro_tag_kWh, .direction='up') %>%
-	fill(verbrauch_strom_gesamt_pro_tag, .direction='up') %>%
+df2 <- df_days %>%
+	#left_join(df, by='datum') %>%
+	#fill(verbrauch_gas_pro_tag_kWh, .direction='up') %>%
+	#fill(verbrauch_wasser_pro_tag_l, .direction='up') %>%
+	#fill(verbrauch_strom_nt_pro_tag_kWh, .direction='up') %>%
+	#fill(verbrauch_strom_ht_pro_tag_kWh, .direction='up') %>%
+	#fill(verbrauch_strom_gesamt_pro_tag, .direction='up') %>%
 	mutate(jahr = as.numeric(format(datum, format = "%Y"))) %>%
 	left_join(dfpreise, by="jahr") %>%
-	mutate(abgelesen_flag = ifelse(is.na(timestamp_orig), FALSE, TRUE)) %>%
+	left_join(df_datum_tage_pro_monat_join, by='datum') %>% 
+	#mutate(abgelesen_flag = ifelse(is.na(timestamp_orig), FALSE, TRUE)) %>%
 	mutate(
 				 bezug_wasser = verbrauch_wasser_pro_tag_l/1000*preis_menge_wasser*(1+mwst1)*100, # bei 100l etwa 13 Rp. pro Tag
 				 bezug_gas = verbrauch_gas_pro_tag_kWh *preis_menge_gas*(1+mwst2), # etwa 7.6 Rp. pro kWh
@@ -272,5 +368,4 @@ png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_jahrmonat_stack
 		width=850, height=700)
  print(kostenplot3)
 dev.off()
-
 
