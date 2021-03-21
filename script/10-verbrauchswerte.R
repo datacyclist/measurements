@@ -123,7 +123,8 @@ df_days <- df_hours_join %>%
 	ungroup()  %>%
 	left_join(df_abgelesen_logical, by='timestamp_day') %>%
 	mutate(datum = as.POSIXct(format(timestamp_day, format="%Y-%m-%d"))) %>%
-	mutate(abgelesen_flag = replace_na(abgelesen_flag, FALSE))
+	mutate(abgelesen_flag = replace_na(abgelesen_flag, FALSE)) %>%
+	write_csv2(path=paste(cachedirprefix, "dfdays.csv" , sep =""))
 	
 ########################################
 # Tage pro Monat -- nicht immer 30...
@@ -277,7 +278,7 @@ kostenplot <- ggplot(dfplot2) +
 	#scale_fill_brewer(type='qual') +
 	scale_fill_brewer(type='div') +
 	theme_verbrauch() +
-	labs(title="Kosten Energie/Wasser OD10 im Zeitverlauf",
+	labs(title=paste("Kosten Energie/Wasser OD10 im Zeitverlauf, generiert ", filedateprefix, sep=""),
 	     y = 'Rp. pro Tag',
 			 x = 'Datum'
 	)
