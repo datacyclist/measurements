@@ -75,3 +75,51 @@ df_kWh_ht_nt <- dat %>%
 
 # der Offset zu den abgelesenen Zählerwerten steigt. Hm. Muss ich wohl mal
 # beobachten. Vielleicht fehlen Blinkimpulse bei hohen Leistungen.
+
+# Aus den _abgelesenen_ Werten die errechneten Tageswerte dazuholen:
+
+# Eine Verbrauchszeile pro Tag:
+dfdays <- read_csv2(file=paste(cachedirprefix, "dfdays.csv" , sep =""))
+
+df_days_for_join <- dfdays %>%
+		filter(timestamp_day >=format(as.Date("20210301", "%Y%m%d"))) %>%
+		arrange(timestamp_day) %>%
+		mutate(
+					 gas_kum = cumsum(verbrauch_gas_pro_tag_kWh),
+					 wasser_kum = cumsum(verbrauch_wasser_pro_tag_l),
+					 strom_ht_kum = cumsum(verbrauch_strom_ht_pro_tag_kWh),
+					 strom_nt_kum = cumsum(verbrauch_strom_nt_pro_tag_kWh),
+					 strom_HT_kum_blink = strom_ht_kum + 4666,
+					 strom_NT_kum_blink = strom_nt_kum + 9269,
+					 ) %>%
+		select(timestamp_day, matches('kum')) %>%
+		mutate(datum = format(as.Date(timestamp_day), "%Y%m%d"))
+
+
+dfplot <- df_kWh_ht_nt %>%
+		inner_join(df_days_for_join, by='datum') %>%
+		select(datum, HT_stand_cum, NT_stand_cum, strom_HT_kum_blink, strom_NT_kum_blink) %>%
+		melt(id.vars='datum') %>%
+		mutate(group = ifelse(grepl("NT", variable), "NT", "HT"))
+
+strom_vergleich_plot <- ggplot(dfplot) +
+	geom_line(aes(x=datum, y=value, group=variable, colour=variable), size=1.2) +
+	#scale_colour_identity() +
+	scale_colour_brewer(type='qual', direction=1) +
+	facet_wrap(~group, ncol=1, scales='free_y') +
+	theme_verbrauch() +
+	labs(title=paste("Strom, abgelesen vs. Blink-LED, generiert ", filedateprefix, sep=""),
+	     y = 'Kumulierter Wert [kWh]',
+			 x = 'Datum'
+			 ) +
+	theme(axis.text.x=element_text(angle=90)) +
+
+png(filename=paste(figdirprefix, filedateprefix, "-strom-zaehlerstaende.png", sep=''),
+		width=1400, height=600)
+ print(strom_vergleich_plot)
+dev.off()
+
+
+
+
+
