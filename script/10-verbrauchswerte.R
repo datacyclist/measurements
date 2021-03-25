@@ -48,7 +48,7 @@ df_abgelesen_logical <- dat %>%
 	mutate(abgelesen_flag = TRUE)
 
 ########################################
-# Daten vorbearbeiten und bereinigen -- auf Stundenbasis runterbrechen
+cat(" Daten vorbearbeiten und bereinigen -- auf Stundenbasis runterbrechen \n")
 ########################################
 
 #df <- dat %>%
@@ -122,9 +122,12 @@ df_days <- df_hours_join %>%
 						verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh) %>%
 	ungroup()  %>%
 	left_join(df_abgelesen_logical, by='timestamp_day') %>%
-	mutate(datum = as.POSIXct(format(timestamp_day, format="%Y-%m-%d"))) %>%
-	mutate(abgelesen_flag = replace_na(abgelesen_flag, FALSE)) %>%
-	write_csv2(path=paste(cachedirprefix, "dfdays.csv" , sep =""))
+	#mutate(datum = as.Date(format(timestamp_day, format="%Y-%m-%d", tz='Europe/Zurich'))) %>%
+	mutate(datum = as.Date(timestamp_day)) %>%
+				 #, format="%Y-%m-%d")) %>%
+	mutate(abgelesen_flag = replace_na(abgelesen_flag, FALSE))
+
+w1 <- write_csv2(x=df_days, path=paste(cachedirprefix, "dfdays.csv" , sep =""))
 	
 ########################################
 # Tage pro Monat -- nicht immer 30...
@@ -135,6 +138,7 @@ df_datum_tage_pro_monat_join <- data.frame(datum=seq.Date(as.Date(min(df_days$da
 					mutate(
 								 JahrMonat = as.factor(format(datum, format = "%Y-%m")),
 								 tage_pro_monat = days_in_month(datum)
+	               #datum = format(datum, format="%Y-%m-%d", tz='Europe/Zurich')
 								 )
 
 # Tage pro Monat und Jahr-Monat dranhaengen
@@ -142,7 +146,7 @@ df1 <- df_datum_tage_pro_monat_join %>%
 				left_join(df_days, by='datum') 
 	
 ###############################
-# Verbrauchswerte und Plot dazu
+cat("Verbrauchswerte und Plot dazu \n")
 ###############################
 
 #df1 <- datedf %>%
@@ -227,7 +231,7 @@ dev.off()
 
 
 ###############################
-# Verbrauchs*kosten* und Plot dazu
+cat("Verbrauchs*kosten* und Plot dazu \n")
 ###############################
 
 # alles Bruttokosten, d.h. inkl. MWSt. (7.7% Gas/Strom, 2.5% Wasser)
@@ -289,7 +293,7 @@ png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf.png", sep=''),
 dev.off()
 
 ##############################
-# Kosten auf Monate aggregieren
+cat("Kosten auf Monate aggregieren \n")
 ##############################
 
 df2_monate <- df2 %>%
