@@ -45,20 +45,6 @@ dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*.csv", full.n
 # Zählerstände werden per Offset (aus abgelesenen Werten an bestimmtem Datum)
 # und cumsum errechnet
 
-#dft1 <- dat %>%
-#				mutate(
-#				 timestamp_utc = X1,
-#				 timestamp = as.POSIXct(format(timestamp_utc, tz='Europe/Zurich')),
-#				 Wh = X2,
-#				 wochentag = wday(timestamp),
-#				 stunde = hour(timestamp),
-#				 ht_nt = ifelse(
-#												(wochentag %in% c(1:5) & stunde %in% c(7:18)), 
-#												"HT", 
-#												"NT"),
-#				 datum = format(timestamp, "%Y%m%d")
-#				)
-
 df_kWh_ht_nt <- dat %>%
 				mutate(
 				 timestamp_utc = X1,
@@ -132,8 +118,3 @@ png(filename=paste(figdirprefix, filedateprefix, "-strom-zaehlerstaende.png", se
 		width=1400, height=600)
  print(strom_vergleich_plot)
 dev.off()
-
-
-
-
-
