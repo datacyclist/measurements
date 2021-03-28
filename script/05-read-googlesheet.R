@@ -27,7 +27,10 @@ dat <- read_sheet(url) %>%
 				 strom_nacht = 'Strom Wert 1.8.2 [kWh]',
 				 gas = Gas,
 				 wasser = Wasser) %>%
-	mutate(gas = as.numeric(gas),
+	mutate(
+				 strom_tag = as.numeric(strom_tag),
+				 strom_nacht = as.numeric(strom_nacht),
+				 gas = as.numeric(gas),
 				 wasser = as.numeric(wasser)
 				 )
 
