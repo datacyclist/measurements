@@ -71,7 +71,7 @@ df_kWh_ht_nt <- dat %>%
 				 HT_stand_cum = cumsum(HT)/1000 + 4666,
 				 NT_stand_cum = cumsum(NT)/1000 + 9269
 				 ) %>%
-  write_csv(path=paste(cachedirprefix, filedateprefix, "-zaehlerstande-strom_errechnet.csv", sep=""))
+  write_csv(file=paste(cachedirprefix, filedateprefix, "-zaehlerstande-strom_errechnet.csv", sep=""))
 
 # der Offset zu den abgelesenen Zählerwerten steigt. Hm. Muss ich wohl mal
 # beobachten. Vielleicht fehlen Blinkimpulse bei hohen Leistungen.
