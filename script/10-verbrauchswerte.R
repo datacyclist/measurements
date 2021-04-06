@@ -51,29 +51,6 @@ df_abgelesen_logical <- dat %>%
 cat(" Daten vorbearbeiten und bereinigen -- auf Stundenbasis runterbrechen \n")
 ########################################
 
-#df <- dat %>%
-#	arrange(timestamp) %>%
-#	# nutze nur den letzten Messwert eines Tages (andere Zeilen rausfiltern)
-#	mutate(datum = as.Date(timestamp)) %>%
-#	group_by(datum) %>%
-#	filter(row_number() == n()) %>%
-#	ungroup() %>%
-#	# hier normal weiter
-#	mutate(
-#				 diff_h = interval(lag(timestamp),timestamp)/hours(1),
-#				 diff_gas = gas - lag(gas),
-#				 diff_wasser = wasser - lag(wasser),
-#				 diff_strom_ht = strom_tag-lag(strom_tag),
-#				 diff_strom_nt = strom_nacht-lag(strom_nacht),
-#				 #verbrauch_gas_pro_tag_m3 = diff_gas/diff_h*24,
-#				 verbrauch_gas_pro_tag_kWh = diff_gas/diff_h*24*10.17,
-#				 verbrauch_wasser_pro_tag_l = diff_wasser/diff_h*24*1000,
-#				 verbrauch_strom_ht_pro_tag_kWh = diff_strom_ht/diff_h*24,
-#				 verbrauch_strom_nt_pro_tag_kWh = diff_strom_nt/diff_h*24,
-#				 verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh,
-#				 timestamp_orig = timestamp
-#				 )
-
 df_hours <- dat %>%
 	arrange(timestamp) %>%
 	mutate(
@@ -127,7 +104,7 @@ df_days <- df_hours_join %>%
 				 #, format="%Y-%m-%d")) %>%
 	mutate(abgelesen_flag = replace_na(abgelesen_flag, FALSE))
 
-w1 <- write_csv2(x=df_days, path=paste(cachedirprefix, "dfdays.csv" , sep =""))
+w1 <- write_csv2(x=df_days, file=paste(cachedirprefix, "dfdays.csv" , sep =""))
 	
 ########################################
 # Tage pro Monat -- nicht immer 30...
@@ -373,4 +350,3 @@ png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_jahrmonat_stack
 		width=850, height=700)
  print(kostenplot3)
 dev.off()
-
