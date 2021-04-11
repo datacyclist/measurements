@@ -16,7 +16,7 @@ library(googlesheets4)
 library(readr)
 
 # set this to TRUE if testing
-testing <- FALSE
+testing <- TRUE
 
 if(!(file.exists(file=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))) |
 	 testing){
@@ -32,8 +32,8 @@ dat <- read_sheet(url) %>%
 				 strom_nacht = 'Strom Wert 1.8.2 [kWh]',
 				 gas = Gas,
 				 wasser = Wasser) %>%
-	select(strom_tag, strom_nacht, gas, wasser, timestamp) %>%
-	drop_na() %>%
+	select(strom_tag, strom_nacht, gas, wasser, timestamp, kommentar) %>%
+	#drop_na() %>%
 	mutate(
 				 strom_tag = as.numeric(unlist(strom_tag)),
 				 strom_nacht = as.numeric(unlist(strom_nacht)),
