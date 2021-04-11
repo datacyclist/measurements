@@ -22,17 +22,30 @@ library(reshape2)
 library(readr)
 
 source("theme-verbrauch.R")
-source("05-read-googlesheet.R")
 source("08-grundpreise.R")
+
+# wird nicht mehr gebraucht, da ich nicht mehr in den Keller muss
+# source("05-read-googlesheet.R") 
 
 options("lubridate.week.start"=1)
 
 filedateprefix <- format(Sys.time(), "%Y%m%d")
 figdirprefix <- '../figs/'
 cachedirprefix <- '../cache/'
+# Ablesewerte werden hier manuell abgelegt
+csvdirprefix <- '../csv/'
 
 
-dat <- read_csv(file=paste(cachedirprefix, filedateprefix, "-ablesewerte.csv", sep=""))
+# archivierte Ablesewerte aus dem Google-Sheet...
+dat1 <- read_csv(file=paste(csvdirprefix, "20210410-ablesewerte.csv", sep=""))
+# ...und die aktuellen Ablesewerte
+dat2 <- read_tsv(file=paste(csvdirprefix, "ablesewerte-zum-eintragen.csv", sep=""))
+
+# ...zusammenhängen (Reihenfolge von dat1 vorher an dat2 anpassen)
+dat <- dat1 %>%
+	select(timestamp,strom_tag, strom_nacht, gas, wasser, kommentar) %>%
+	rbind(dat2)
+	
 
 ##############################
 # Ablesetage bestimmen
