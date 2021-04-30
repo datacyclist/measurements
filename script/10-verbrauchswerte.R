@@ -343,12 +343,12 @@ df2_monate <- df2 %>%
 						bezug_gas = sum(bezug_gas),
 						bezug_wasser = sum(bezug_wasser),
 						#tage = n(),
-						#grund_wasser = sum(grundpreis_wasser),
-						#grund_strom = sum(grundpreis_strom),
-						#grund_gas = sum(grundpreis_gas),
-						grund_wasser = unique(preis_grund_wasser)*100,
-						grund_strom = unique(preis_grund_strom)*100,
-						grund_gas = unique(preis_grund_gas)*100,
+						grund_wasser = sum(grundpreis_wasser),
+						grund_strom = sum(grundpreis_strom),
+						grund_gas = sum(grundpreis_gas),
+						#grund_wasser = unique(preis_grund_wasser)*100,
+						#grund_strom = unique(preis_grund_strom)*100,
+						#grund_gas = unique(preis_grund_gas)*100,
 						summe_kosten = bezug_strom_ht +
 										bezug_strom_nt + 
 										bezug_strom_sdl_kev_abgaben +
