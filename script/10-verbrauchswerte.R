@@ -202,9 +202,54 @@ dfplot1 <- df1_monate %>%
 														 )
 		)
 
+dfplot1_ann_pos <- df1_monate %>%
+	mutate(pos_strom = round(strom_ges_kWh),
+				 pos_wasser = round(wasser_l, digits=0),
+				 pos_gas = round(gas_kWh, digits=0)
+				 ) %>%
+	select(JahrMonat, starts_with("pos")) %>%
+	melt(id.vars="JahrMonat") %>%
+	mutate(
+				 ypos = value,
+				 group = case_when(
+														 grepl('strom',variable) ~ 'Strom [kWh]',
+														 grepl('wasser', variable) ~ 'Wasser [Liter]',
+														 #grepl('gas', variable) ~ 'Gas [m3 und kWh]'
+														 grepl('gas', variable) ~ 'Gas [kWh]'
+														 ),
+				 variable = NULL,
+				 value = NULL
+	)
+
+dfplot1_ann_labels <- df1_monate %>%
+	mutate(label_strom = paste(round(strom_ht_kWh, digits=0), 
+														 round(strom_nt_kWh, digits=0), sep = " | "),
+				 label_wasser = round(wasser_l, digits=0),
+				 label_gas = round(gas_kWh, digits=0)
+				 ) %>%
+	select(JahrMonat, starts_with("label")) %>%
+	melt(id.vars="JahrMonat") %>%
+	mutate(
+				 label = value,
+				 group = case_when(
+														 grepl('strom',variable) ~ 'Strom [kWh]',
+														 grepl('wasser', variable) ~ 'Wasser [Liter]',
+														 #grepl('gas', variable) ~ 'Gas [m3 und kWh]'
+														 grepl('gas', variable) ~ 'Gas [kWh]'
+														 ),
+				 variable = NULL,
+				 value = NULL
+				 )
+
+dfplot1_ann <- dfplot1_ann_pos %>%
+	inner_join(dfplot1_ann_labels, by=c("JahrMonat", "group"))
+
+  
 verbrauchsplot1 <- ggplot(dfplot1) +
 	geom_col(aes(x=JahrMonat, y=value, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
 	#scale_colour_identity() +
+	geom_text(data=dfplot1_ann, aes(x=JahrMonat, y=0, vjust=-0.5,
+																	label=label)) +
 	facet_wrap(~group, ncol=1, scales='free_y') +
 	scale_fill_brewer(type='qual', direction=-1) +
 	theme_verbrauch() +
@@ -298,12 +343,12 @@ df2_monate <- df2 %>%
 						bezug_gas = sum(bezug_gas),
 						bezug_wasser = sum(bezug_wasser),
 						#tage = n(),
-						#grund_wasser = sum(grundpreis_wasser),
-						#grund_strom = sum(grundpreis_strom),
-						#grund_gas = sum(grundpreis_gas),
-						grund_wasser = unique(preis_grund_wasser)*100,
-						grund_strom = unique(preis_grund_strom)*100,
-						grund_gas = unique(preis_grund_gas)*100,
+						grund_wasser = sum(grundpreis_wasser),
+						grund_strom = sum(grundpreis_strom),
+						grund_gas = sum(grundpreis_gas),
+						#grund_wasser = unique(preis_grund_wasser)*100,
+						#grund_strom = unique(preis_grund_strom)*100,
+						#grund_gas = unique(preis_grund_gas)*100,
 						summe_kosten = bezug_strom_ht +
 										bezug_strom_nt + 
 										bezug_strom_sdl_kev_abgaben +
