@@ -101,5 +101,5 @@ while True:
             filenamedate = datetime.fromtimestamp(ts).strftime('%Y%m%d')
 #           print(sttime)
             append_new_line('/var/tmp/'+filenamedate+'-stromzaehler-ping.csv', sttime+',1')
-            subprocess.call("/home/russ/bin/measurements/zaehlerablesung/influx_write_zaehler.sh")
+            subprocess.run("/home/russ/bin/measurements/zaehlerablesung/influx_write_zaehler.sh")
 
