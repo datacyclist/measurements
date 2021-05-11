@@ -14,7 +14,7 @@ import time
 # alle Messwerte aufs LCD im HWR schreiben
 
 # Warten, weil innerhalb vom Cronjob gestartet und weil Daten aus Files eingelesen werden.
-time.sleep(12)
+# time.sleep(12)
 
 ##############################
 # LCD konfigurieren
@@ -53,47 +53,50 @@ timedate = strftime("%Y-%m-%d %H:%M")
 
 # Kesseltemperatur
 ftempKessel = open('/var/tmp/kesseltemp','r')                                                                     
-tempKessel = ftempKessel.read()                                                                                   
+tempKessel = str(round(float(ftempKessel.read()),1))
 ftempKessel.close()                                                                                                
-#print(tempKessel)
+# print(tempKessel)
 
 # Vorlauftemperatur
 ftempVorlauf = open('/var/tmp/vorlauftemp','r')                                                                     
-tempVorlauf = ftempVorlauf.read()                                                                                   
+tempVorlauf = str(round(float(ftempVorlauf.read()),1))
 ftempVorlauf.close()                                                                                                
-#print(tempVorlauf)
+# print(tempVorlauf)
 
 # Abgastemperatur
 ftempAbgas = open('/var/tmp/abgastemp','r')                                                                     
-tempAbgas = ftempAbgas.read()                                                                                   
+tempAbgas = str(round(float(ftempAbgas.read()),1))
 ftempAbgas.close()                                                                                                
-#print(tempAbgas)
+# print(tempAbgas)
 
 # Warmwassertemperatur
 ftempWW = open('/var/tmp/wwtemp','r')                                                                     
-tempWW = ftempWW.read()                                                                                   
+tempWW = str(round(float(ftempWW.read()),1))
 ftempWW.close()                                                                                                
-#print(tempWW)
+# print(tempWW)
 
 # HWR-Temperatur
 ftempbmp280 = open('/var/tmp/bmp280_temperature','r')                                                                     
-tempbmp280 = ftempbmp280.read()                                                                                   
+tempbmp280 = str(round(float(ftempbmp280.read()),1))
 ftempbmp280.close()                                                                                                
-#print(tempbmp280)
+# print(tempbmp280)
 
 #line1 = time + "       " + tempshort + chr(223) + "C"
 #line1 = timedate + "       " + mintemp + chr(223) + "C"
 #line1 = "  " + timedate + "  "
-line1 = "Vorlauf: " + str(tempVorlauf) + chr(223) + "C"
-line2 = "Abgas: " + str(tempAbgas) + chr(223) + "C"
-line3 = "WW: " + tempWW+chr(223)+"C"
-line4 = "HWR   : " + tempbmp280+chr(223)+"C  "
+line1 = "     Abgas: " + tempAbgas + chr(223)+"C"
+line2 = "   Vorlauf: " + tempVorlauf + chr(223)+"C"
+line3 = "Warmwasser: " + tempWW + chr(223)+"C"
+line4 = "Innen/HWR : " + tempbmp280 + chr(223)+"C  "
 #line2 = humishort + "%      " + presshort + "hPa"
 #line3 = presshort + "hPa" + humishort + "%"
 #line3 = presshort + "hPa"
 #line3 = " "
 
+#print(line3)
+
 # Print a four line message
+#lcd.message(line3)
 lcd.message(line1 + "\n" + line2 + "\n" + line3 + "\n" + line4)
 #  time.sleep(12)
 #  count +=1
