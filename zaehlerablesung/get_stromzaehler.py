@@ -7,7 +7,7 @@ import os
 #import dateutil
 from datetime import datetime,date
 from time import gmtime,strftime
-import httplib, urllib
+import http.client, urllib
 import pytz
 import subprocess
 # import bme280
