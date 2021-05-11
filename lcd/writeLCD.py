@@ -52,16 +52,28 @@ timedate = strftime("%Y-%m-%d %H:%M")
 # alle Variablen aus Files lesen
 
 # Kesseltemperatur
-ftempDS18B20 = open('/var/tmp/ds18b20_temperature','r')                                                                     
-tempDS18B20 = ftempDS18B20.read()                                                                                   
-ftempDS18B20.close()                                                                                                
-#print(tempDS18B20)
+ftempKessel = open('/var/tmp/kesseltemp','r')                                                                     
+tempKessel = ftempKessel.read()                                                                                   
+ftempKessel.close()                                                                                                
+#print(tempKessel)
 
-# Aussentemperatur
-ftempbmp085 = open('/var/tmp/bmp085_temperature','r')                                                                     
-tempbmp085 = ftempbmp085.read()                                                                                   
-ftempbmp085.close()                                                                                                
-#print(tempbmp085)
+# Vorlauftemperatur
+ftempVorlauf = open('/var/tmp/vorlauftemp','r')                                                                     
+tempVorlauf = ftempVorlauf.read()                                                                                   
+ftempVorlauf.close()                                                                                                
+#print(tempVorlauf)
+
+# Abgastemperatur
+ftempAbgas = open('/var/tmp/abgastemp','r')                                                                     
+tempAbgas = ftempAbgas.read()                                                                                   
+ftempAbgas.close()                                                                                                
+#print(tempAbgas)
+
+# Warmwassertemperatur
+ftempWW = open('/var/tmp/wwtemp','r')                                                                     
+tempWW = ftempWW.read()                                                                                   
+ftempWW.close()                                                                                                
+#print(tempWW)
 
 # HWR-Temperatur
 ftempbmp280 = open('/var/tmp/bmp280_temperature','r')                                                                     
@@ -71,10 +83,11 @@ ftempbmp280.close()
 
 #line1 = time + "       " + tempshort + chr(223) + "C"
 #line1 = timedate + "       " + mintemp + chr(223) + "C"
-line1 = "  " + timedate + "  "
-line2 = "Aussen: " + str(tempbmp085) + chr(223) + "C"
-line3 = "HWR   : " + tempbmp280+chr(223)+"C  "
-line4 = "Kessel: " + tempDS18B20+chr(223)+"C"
+#line1 = "  " + timedate + "  "
+line1 = "Vorlauf: " + str(tempVorlauf) + chr(223) + "C"
+line2 = "Abgas: " + str(tempAbgas) + chr(223) + "C"
+line3 = "WW: " + tempWW+chr(223)+"C"
+line4 = "HWR   : " + tempbmp280+chr(223)+"C  "
 #line2 = humishort + "%      " + presshort + "hPa"
 #line3 = presshort + "hPa" + humishort + "%"
 #line3 = presshort + "hPa"
@@ -102,7 +115,7 @@ lcd.message(line1 + "\n" + line2 + "\n" + line3 + "\n" + line4)
 
 #    uhrzeit = strftime("%H:%M")                                                                                         
 #    line1 = "Soll " + sollwert + "/" + sollwertsolo + " " + belegung                                                    
-#    line2 = "Ist: " + tempDS18B20+ chr(223) + "C " + heizstatus                                                         
+#    line2 = "Ist: " + tempKessel+ chr(223) + "C " + heizstatus                                                         
 #    lcd.message(line1 + "\n" + line2)                                                                                   
 #    time.sleep(12)                                                                                                      
 #    count +=1   
