@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INFLUX_TOKEN=`cat influx_token`
+INFLUX_TOKEN=`cat /home/russ/bin/measurements/zaehlerablesung/influx_token`
 
 # Wenn das Script aufgerufen wird, wird ein Datenpunkt nach InfluxDB geschrieben.
 # Der Datenpunkt entspricht 1Wh verbrauchter Energie.
