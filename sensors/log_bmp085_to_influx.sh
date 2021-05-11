@@ -14,7 +14,7 @@ MESSWERTE=`./get_sensor_bmp085.py`
 
 # umformatieren
 
-echo $MESSWERTE
+#echo $MESSWERTE
 
 # vorher
 # getTempAged.value 8.500000
@@ -26,7 +26,7 @@ echo $MESSWERTE
 
 MESS=`echo $MESSWERTE | sed 's/ air/\nair/g;' `
 
-echo $MESS
+#echo $MESS
 
 # such a mess...
 
