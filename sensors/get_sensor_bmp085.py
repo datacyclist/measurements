@@ -11,6 +11,8 @@ from time import gmtime,strftime
 
 ##############################
 # den BMP085 auslesen
+#
+# Messwerte werden als Text ausgegeben und dann in einem bash-script weiterverarbeitet
 ##############################
 
 sensorbmp = BMP085.BMP085()
@@ -19,20 +21,19 @@ pressure = format(sensorbmp.read_pressure())
 #print 'Temp = {0:0.2f} *C'.format(sensorbmp.read_temperature())
 
 tempbmp = str(float(format(sensorbmp.read_temperature()))-0)
-#print tempbmp
-ftempbmp = open('/var/tmp/bmp085_temperature', 'w')	
-ftempbmp.write(tempbmp)
-ftempbmp.close()
+print('temperature_sth value=' + tempbmp)
+# ftempbmp = open('/var/tmp/bmp085_temperature', 'w')	
+# ftempbmp.write(tempbmp)
+# ftempbmp.close()
 
 pressure = sensorbmp.read_pressure()
 presshort = str(round(float(pressure)/100,1))
-#print presshort
+print('airpressure value=' + presshort)
 
-fpressbmp = open('/var/tmp/bmp085_pressure', 'w')	
-fpressbmp.write(presshort)
-fpressbmp.close()
+# fpressbmp = open('/var/tmp/bmp085_pressure', 'w')	
+# fpressbmp.write(presshort)
+# fpressbmp.close()
 
 # humidity = open('/var/tmp/bmp085_humidity', 'w')	
 # humidity.write(humishort)
 # humidity.close()
-
