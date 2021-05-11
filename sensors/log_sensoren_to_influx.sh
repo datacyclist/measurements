@@ -10,7 +10,8 @@ INFLUX_TOKEN=`cat influx_token`
 #
 #echo $MESSWERTE
 # Daten von Sensor holen
-MESSWERTE=`./get_sensor_bmp085.py`
+MESSWERTEAUSSEN=`./get_sensor_bmp085.py`
+MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 
 # umformatieren
 
@@ -22,9 +23,14 @@ MESSWERTE=`./get_sensor_bmp085.py`
 # nachher
 # getTempAged value=8.500000
 
+# alle Messwerte hintereinander
+MESSWERTE="$MESSWERTEAUSSEN $MESSWERTEKELLER"
+
+#echo $MESSWERTE
+
 # Messwertzeilen durch \n getrennt
 
-MESS=`echo $MESSWERTE | sed 's/ air/\nair/g;' `
+MESS=`echo $MESSWERTE | sed 's/ airpressure/\nairpressure/g;s/ basement/\nbasement/g' `
 
 #echo $MESS
 

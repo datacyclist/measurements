@@ -24,9 +24,10 @@ def aktuelleTemperatur():
 
 
 messdaten = aktuelleTemperatur()
-ds18b20temp = open('/var/tmp/ds18b20_temperature', 'w')
-ds18b20temp.write(aktuelleTemperatur())
-ds18b20temp.close()
+# ds18b20temp = open('/var/tmp/ds18b20_temperature', 'w')
+# ds18b20temp.write(aktuelleTemperatur())
+# ds18b20temp.close()
+print('basementtemp value=' + messdaten)
 
 # schleifenZaehler = 0
 # schleifenAnzahl = 4
