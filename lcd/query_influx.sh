@@ -28,7 +28,7 @@ KESSELTEMP=`echo "$CSVDATA" | awk /getTempKist/ | awk -F "," '{ print $7 }'`
 VORLAUFTEMP=`echo "$CSVDATA" | awk /getTempVListM1/ | awk -F "," '{ print $7 }'`
 WWTEMP=`echo "$CSVDATA" | awk /getTempWWist/ | awk -F "," '{ print $7 }'`
 
-echo $ABGASTEMP >> /var/tmp/abgastemp
-echo $KESSELTEMP >> /var/tmp/kesseltemp
-echo $VORLAUFTEMP >> /var/tmp/vorlauftemp
-echo $WWTEMP >> /var/tmp/wwtemp
+echo $ABGASTEMP > /var/tmp/abgastemp
+echo $KESSELTEMP > /var/tmp/kesseltemp
+echo $VORLAUFTEMP > /var/tmp/vorlauftemp
+echo $WWTEMP > /var/tmp/wwtemp
