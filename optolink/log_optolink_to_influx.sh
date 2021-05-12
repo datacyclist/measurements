@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# script läuft auf host raspberryiot
+
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
 API_KEY_TS=`cat thingspeak_apikey`
@@ -35,10 +37,10 @@ curl -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?or
 # Daten nach thingspeak loggen
 ##############################
 
-TEMPERATUR_NORDSEITE=`echo $MESSWERTE | sed 's/.*getTempA.value\s\(-*[0-9][0-9].[0-9]\).*getVol.*/\1/'`
+TEMPERATUR_NORDSEITE=`echo $MESSWERTE | sed 's/.*getTempA.value\s\(-*[0-9]*[0-9].[0-9]\).*getVol.*/\1/'`
 #echo $TEMPERATUR_NORDSEITE
 
-TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\(-*[0-9][0-9].[0-9]\).*getTempWWsoll.*/\1/'`
+TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\([0-9]*[0-9].[0-9]\).*getTempWWsoll.*/\1/'`
 #echo $TEMPERATUR_NORDSEITE
 
 TEMPERATUR_HWR=`cat /var/tmp/bmp280_temperature`
