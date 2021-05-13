@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# script läuft auf host smartmeter
+
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
 API_KEY_TS=`cat thingspeak_apikey`
@@ -55,7 +57,7 @@ curl -s -i -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write
 sleep 30s
 
 #echo $MESSWERTEAUSSEN
-TEMPERATUR_SUEDSEITE=`echo $MESSWERTEAUSSEN | sed 's/.*temperature_sth\svalue=\(-*[0-9][0-9].[0-9]\).*air.*/\1/'`
+TEMPERATUR_SUEDSEITE=`echo $MESSWERTEAUSSEN | sed 's/.*temperature_sth\svalue=\(-*[0-9]*[0-9].[0-9]\).*air.*/\1/'`
 echo $TEMPERATUR_SUEDSEITE
 
 LUFTDRUCK=`echo $MESSWERTEAUSSEN | sed 's/.*airpressure\svalue=\([0-9]*[0-9][0-9][0-9].[0-9]\).*/\1/'`
