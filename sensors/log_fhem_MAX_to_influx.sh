@@ -1,6 +1,8 @@
 #!/bin/bash
 
+########################################
 # requires dconv (from package dateutils)
+# script läuft auf raspberryiot (bzw. dem Host, der das FHEM hat)
 
 # dieses Script benutzt die Logfiles, die FHEM pro Heizungsthermostat in
 # /opt/fhem/log ablegt
@@ -12,6 +14,8 @@
 
 # Beispiel für eine einzelne Zeile im Line-Protocol:
 # valveposition,thermostat=MAX_009404 value=0 1620937787
+
+########################################
 
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
