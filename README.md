@@ -1,7 +1,15 @@
 # measurements
 
-Create graphs and statistics from my home's consumption of gas, water and power
--- later also for solar power generation and for A/C (planned 2021).
+Collect, crunch and visualize data from my home.
+
+What's collected:
+
+- Heating parameters for all rooms
+- Central heating parameters (Viessmann via optolink)
+- Different inside and outside temperature sensors
+- Electrical power consumption (central)
+- Electrical power consumption (single large consumption points like A/C)
+- Readings from gas and water meters
 
 ## manual readings
 
@@ -42,9 +50,24 @@ This dir stores some auxiliary data.
 Any figure output from R is put into this folder. Folder contents are not usually
 checked in.
 
+## lcd
+
+Two scripts to write temperature data to the blue 20x4 LCD.
+
+## sensors
+
+- Python scripts for temperature and pressure readings.
+- bash script to log sensors to InfluxDB
+- bash script to log thermostat readings to InfluxDB
+
 ## script
 
 R scripts for data handling and graphics generation go in here.
+
+## shellscripts
+
+- remote control for wifi switches
+- remote control for Viessmann heating
 
 ## zaehlerablesung
 
