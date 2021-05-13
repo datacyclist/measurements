@@ -19,6 +19,11 @@ Daily power consumption is crunched into a one-line-per-day csv file in the
 cache dir. Readings are copied manually from this file into the csv readings
 file.
 
+## heating/thermostats
+
+The remote-controlled MAX thermostats transmit a lot of readings to FHEM. Those
+are crunched and uploaded to an InfluxDB, where Grafana gets that data for dashboards.
+
 # directories
 
 ## cache
