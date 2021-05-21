@@ -1,0 +1,10 @@
+[Unit]
+Description=Stromzaehler-Logger
+After=multi-user.target
+
+[Service]
+WorkingDir=/home/russ/bin/measurements/zaehlerablesung
+ExecStart=/usr/bin/python /home/russ/bin/measurements/zaehlerablesung/get_stromzaehler.py
+
+[Install]
+WantedBy=multi-user.target
