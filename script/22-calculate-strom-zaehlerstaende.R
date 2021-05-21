@@ -3,7 +3,7 @@
 #
 # liegen in CSV-Files, eins pro Tag, pro Zeile ein Timestamp und pro Zeile eine Wh
 #
-# 20210313, Georg Russ
+# 20210315, Georg Russ
 ##############################
 
 library(tidyverse)
@@ -33,7 +33,7 @@ cachedirprefix <- '../cache/'
 #								col_names=FALSE)
 
 ## Daten vom NAS holen, alle CSVs in einem bestimmten Verzeichnis
-dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*.csv", full.names=TRUE) %>%
+dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*stromzaehler-ping.csv", full.names=TRUE) %>%
 			map_df(~read_csv(.,col_names=FALSE))
 
 # Abgenommene Strommenge in HT und NT aufteilen
