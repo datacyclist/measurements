@@ -51,8 +51,8 @@ GPIO.setwarnings(False)
 
 # Pin fuer Taster als Input-Pin setzen
 # GPIO.setup(13, GPIO.IN)
-# Pin fuer Fototransistor als Input-Pin setzen
-GPIO.setup(25, GPIO.IN)
+# Pin fuer Wasserzaehler-Schaltkreis als Input setzen mit Pullup-Widerstand
+GPIO.setup(25, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # Pin fuer LED als Output-Pin setzen
 # GPIO.setup(26, GPIO.OUT)
 
@@ -86,12 +86,12 @@ tz = pytz.timezone('Europe/Zurich')
 ########################################
 
 while True:
+    time.sleep(0.001)
     if GPIO.input(25) == 1:
         # LED Ausschalten
         # GPIO.output(26, GPIO.LOW)
         c=1
     else:
-#        time.sleep(0.2)
         while(c>0):
             c=0
             ts=time.time()
