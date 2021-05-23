@@ -86,6 +86,7 @@ tz = pytz.timezone('Europe/Zurich')
 ########################################
 
 while True:
+    time.sleep(0.001)
     if GPIO.input(18) == 1:
         # LED Ausschalten
         GPIO.output(26, GPIO.LOW)
