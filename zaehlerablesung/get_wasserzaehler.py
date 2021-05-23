@@ -43,38 +43,16 @@ def append_new_line(file_name, text_to_append):
             # append newline
             file_object.write("\n")
 
+tz = pytz.timezone('Europe/Zurich')
+
 import RPi.GPIO as GPIO
 
 # GPIO ueber Nummern ansprechen
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-# Pin fuer Taster als Input-Pin setzen
-# GPIO.setup(13, GPIO.IN)
 # Pin fuer Wasserzaehler-Schaltkreis als Input setzen mit Pullup-Widerstand
 GPIO.setup(25, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-# Pin fuer LED als Output-Pin setzen
-# GPIO.setup(26, GPIO.OUT)
-
-#dtobj = datetime.now(tzinfo=utc)
-#print(dtobj)
-
-# ##############################
-# # fünfmal Blinken der LED beim Start
-# ##############################
-# 
-# for i in range(5):
-#    GPIO.output(26, GPIO.HIGH)
-#    time.sleep(0.15)
-#    GPIO.output(26, GPIO.LOW)
-#    time.sleep(0.15)
-
-# Taster testen
-# input_13=GPIO.input(13)
-# print input_13
-
-tz = pytz.timezone('Europe/Zurich')
-
 
 ########################################
 # Endlosschleife fuers Datenloggen (eine Zeile ins CSV pro S0-Impuls, ein CSV
@@ -88,8 +66,6 @@ tz = pytz.timezone('Europe/Zurich')
 while True:
     time.sleep(0.001)
     if GPIO.input(25) == 1:
-        # LED Ausschalten
-        # GPIO.output(26, GPIO.LOW)
         c=1
     else:
         while(c>0):
