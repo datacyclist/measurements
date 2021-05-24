@@ -47,7 +47,7 @@ df_m3 <- dat %>%
 				 datum = format(timestamp, "%Y%m%d")
 				) %>%
 	filter(timestamp>=format(as.Date("20210501", "%Y%m%d"))) %>%
-	#group_by(datum,ht_nt) %>%
+	group_by(datum) %>%
 	summarise(
 						datum = unique(datum),
 						l = sum(l)
@@ -57,7 +57,7 @@ df_m3 <- dat %>%
 	#replace_na(list(HT=0)) %>%
 	arrange(datum) %>%
 	mutate(
-				 m3_cum = cumsum(l)/1000+377.100
+				 m3_cum = round(cumsum(l)/1000+376.900, digits=2)
 				 #HT_stand_cum = cumsum(HT)/1000 + 4666,
 				# NT_stand_cum = cumsum(NT)/1000 + 9269
 				 ) %>%
