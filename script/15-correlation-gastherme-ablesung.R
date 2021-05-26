@@ -50,6 +50,8 @@ dat <- dat1 %>%
 				 gas_kWh = gas*10.17) %>%
 	select(tag, gas_kWh) %>%
 	mutate(diff_gas = gas_kWh-lag(gas_kWh))
+
+# genauere Werte ab 27.05. -- Ablesefrequenz verdoppelt
 	
 ##############################
 # Daten aus Gastherme-Log holen
@@ -71,7 +73,7 @@ dftherme <- dft %>%
 							 X19=NULL,
 						 # brennerleistung ist in % der maximalen Leistung?
 							 brennerleistung_prozent=as.numeric(X21),
-							 brennerleistung_kW = brennerleistung_prozent/100 * 21,
+							 brennerleistung_kW = brennerleistung_prozent/100 * 19,
 							 X21=NULL,
 				       diff_s = interval(lag(timestamp),timestamp)/hours(1)*3600,
 							 Wh_grob = diff_s * brennerleistung_kW*1000 / 3600,
