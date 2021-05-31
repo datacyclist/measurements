@@ -136,7 +136,7 @@ df1 <- df_datum_tage_pro_monat_join %>%
 				left_join(df_days, by='datum') 
 	
 ###############################
-cat("Verbrauchswerte und Plot dazu \n")
+cat("Verbrauchsmengen und Plot dazu \n")
 ###############################
 
 #df1 <- datedf %>%
@@ -168,7 +168,7 @@ verbrauchsplot <- ggplot(dfplot) +
 	scale_fill_brewer(type='qual', direction=1) +
 	facet_wrap(~group, ncol=1, scales='free_y') +
 	theme_verbrauch() +
-	labs(title=paste("Verbrauchswerte OD10 im Zeitverlauf, generiert ", filedateprefix, sep=""),
+	labs(title=paste("Abnahmemengen OD10 im Zeitverlauf, generiert ", filedateprefix, sep=""),
 	     y = 'Wert in jew. Einheit [l bzw. kWh]',
 			 x = 'Datum'
 			 )
@@ -254,7 +254,7 @@ verbrauchsplot1 <- ggplot(dfplot1) +
 	scale_fill_brewer(type='qual', direction=-1) +
 	theme_verbrauch() +
 	theme(axis.text.x=element_text(angle=90)) +
-	labs(title=paste("Verbrauchswerte OD10, Monate, generiert ", filedateprefix, sep=""),
+	labs(title=paste("Abnahmemengen OD10, Monate, generiert ", filedateprefix, sep=""),
 	     y = 'Wert in jew. Einheit [l bzw. kWh]',
 			 x = 'Jahr-Monat'
 			 )
@@ -284,12 +284,14 @@ df2 <- df_days %>%
 	#mutate(abgelesen_flag = ifelse(is.na(timestamp_orig), FALSE, TRUE)) %>%
 	mutate(
 				 bezug_wasser = verbrauch_wasser_pro_tag_l/1000*preis_menge_wasser*(1+mwst1)*100, # bei 100l etwa 13 Rp. pro Tag
+				 bezug_abwasser = verbrauch_wasser_pro_tag_l/1000*preis_menge_abwasser*(1+mwst2)*100, # Abwasser teurer als Frischwasser
 				 bezug_gas = verbrauch_gas_pro_tag_kWh *preis_menge_gas*(1+mwst2), # etwa 7.6 Rp. pro kWh
 				 bezug_strom_ht = verbrauch_strom_ht_pro_tag_kWh*preis_menge_strom_ht*(1+mwst2), # etwa 20 Rp. pro kWh Normallast
 				 bezug_strom_nt = verbrauch_strom_nt_pro_tag_kWh*preis_menge_strom_nt*(1+mwst2), # etwa 14 Rp. pro kWh Schwachlast
 				 bezug_strom_sdl_kev_abgaben = (verbrauch_strom_ht_pro_tag_kWh+verbrauch_strom_nt_pro_tag_kWh)*
 								 preis_menge_strom_sdl_kev_abgaben*(1+mwst2), # 4 Rp. pro kWh
 				 grundpreis_wasser = preis_grund_wasser*(1+mwst1)/tage_pro_monat*100, # etwa 35 Rp. pro Tag
+				 grundpreis_abwasser = preis_grund_abwasser*(1+mwst2)/tage_pro_monat*100, # etwa 15 Rp. pro Tag Abwassergrundpreis
 				 grundpreis_gas = preis_grund_gas*(1+mwst2)/tage_pro_monat*100, # etwa 23 Rp. pro Tag
 				 grundpreis_strom = preis_grund_strom*(1+mwst2)/tage_pro_monat*100 # etwa 25 Rp. pro Tag
 				 )
@@ -342,8 +344,10 @@ df2_monate <- df2 %>%
 						bezug_strom_sdl_kev_abgaben = sum(bezug_strom_sdl_kev_abgaben),
 						bezug_gas = sum(bezug_gas),
 						bezug_wasser = sum(bezug_wasser),
+						bezug_abwasser = sum(bezug_abwasser),
 						#tage = n(),
 						grund_wasser = sum(grundpreis_wasser),
+						grund_abwasser = sum(grundpreis_abwasser),
 						grund_strom = sum(grundpreis_strom),
 						grund_gas = sum(grundpreis_gas),
 						#grund_wasser = unique(preis_grund_wasser)*100,
@@ -354,7 +358,9 @@ df2_monate <- df2 %>%
 										bezug_strom_sdl_kev_abgaben +
 										bezug_gas +
 										bezug_wasser +
+										bezug_abwasser +
 										grund_wasser +
+										grund_abwasser +
 										grund_strom +
 										grund_gas
 						)
