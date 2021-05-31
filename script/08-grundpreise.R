@@ -14,9 +14,11 @@ preise2021 <- data.frame(jahr=2021) %>%
 												 preis_menge_strom_sdl_kev_abgaben = (0.17+3.73)/(1+mwst2), #Rp.
 												 preis_menge_gas = (5.17+1.88)/(1+mwst2), #Rp.
 												 preis_menge_wasser = 1.28/(1+mwst1), #Fr. pro Kubikmeter,
+												 preis_menge_abwasser = 1.44/(1+mwst2), #Fr. pro Kubikmeter,
 												 preis_grund_wasser = 10.25/(1+mwst1), #Fr. pro Monat
 												 preis_grund_gas = 6.46/(1+mwst2), #Fr. pro Monat
 												 preis_grund_strom = 7.00/(1+mwst2), #Fr. pro Monat
+												 preis_grund_abwasser = 4.00/(1+mwst2), #Fr. pro Monat
 												 )
 
 preise2020 <- data.frame(jahr=2020) %>%
@@ -28,9 +30,11 @@ preise2020 <- data.frame(jahr=2020) %>%
 												 preis_menge_strom_sdl_kev_abgaben = (0.17+3.73)/(1+mwst2), #Rp.
 												 preis_menge_gas = (5.17+1.88)/(1+mwst2), #Rp.
 												 preis_menge_wasser = 1.28/(1+mwst1), #Fr. pro Kubikmeter,
+												 preis_menge_abwasser = 1.44/(1+mwst2), #Fr. pro Kubikmeter,
 												 preis_grund_wasser = 10.25/(1+mwst1), #Fr. pro Monat
 												 preis_grund_gas = 6.46/(1+mwst2), #Fr. pro Monat
 												 preis_grund_strom = 7.00/(1+mwst2), #Fr. pro Monat
+												 preis_grund_abwasser = 4.00/(1+mwst2), #Fr. pro Monat
 												 )
 
 dfpreise <- rbind(preise2020,preise2021)
