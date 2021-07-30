@@ -56,7 +56,7 @@ df_kWh_ht_nt <- dat %>%
 												(wochentag %in% c(1:5) & stunde %in% c(7:18)), 
 												"HT", 
 												"NT"),
-				 datum = as.Date(timestamp, "%Y%m%d")
+				 datum = as.Date(timestamp, "%Y%m%d", tz='Europe/Zurich')
 				) %>%
 	filter(timestamp>=format(as.Date("20210301", "%Y%m%d"))) %>%
 	group_by(datum,ht_nt) %>%
