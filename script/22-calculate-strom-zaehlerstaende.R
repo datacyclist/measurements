@@ -3,7 +3,7 @@
 #
 # liegen in CSV-Files, eins pro Tag, pro Zeile ein Timestamp und pro Zeile eine Wh
 #
-# 20210315, Georg Russ
+# 20210730, Georg Russ
 ##############################
 
 library(tidyverse)
@@ -56,7 +56,7 @@ df_kWh_ht_nt <- dat %>%
 												(wochentag %in% c(1:5) & stunde %in% c(7:18)), 
 												"HT", 
 												"NT"),
-				 datum = format(timestamp, "%Y%m%d")
+				 datum = as.Date(timestamp, "%Y%m%d")
 				) %>%
 	filter(timestamp>=format(as.Date("20210301", "%Y%m%d"))) %>%
 	group_by(datum,ht_nt) %>%
@@ -68,10 +68,21 @@ df_kWh_ht_nt <- dat %>%
 	replace_na(list(HT=0)) %>%
 	arrange(datum) %>%
 	mutate(
-				 HT_stand_cum = cumsum(HT)/1000 + 4666,
-				 NT_stand_cum = cumsum(NT)/1000 + 9269
+				 korrektur_q2_2021 = ifelse((datum>=format(as.Date("20210630", "%Y%m%d"))), 1, 0),
+				 HT_stand_cum = round(cumsum(HT)/1000 + 4666 + korrektur_q2_2021*2.5, digits=3),
+				 NT_stand_cum = round(cumsum(NT)/1000 + 9269 + korrektur_q2_2021*0.5, digits=3),
+				 datumprint = format(datum + days(1) - seconds(1), "%Y-%m-%dT%H:%M:%SZ")
 				 ) %>%
-  write_csv(file=paste(cachedirprefix, filedateprefix, "-zaehlerstande-strom_errechnet.csv", sep=""))
+	select(datumprint, HT_stand_cum, NT_stand_cum) %>%
+	arrange(desc(datumprint)) %>%
+  write_tsv(file=paste(cachedirprefix, filedateprefix, "-zaehlerstande-strom_errechnet.csv", sep=""))
+
+
+
+if(FALSE){
+
+# siehe https://dc.georgruss.ch/2021/03/27/stromzahlerwerte-passen-ja-doch/
+# Denkfehler gehabt :-) 
 
 # der Offset zu den abgelesenen Zählerwerten steigt. Hm. Muss ich wohl mal
 # beobachten. Vielleicht fehlen Blinkimpulse bei hohen Leistungen.
@@ -118,3 +129,4 @@ png(filename=paste(figdirprefix, filedateprefix, "-strom-zaehlerstaende.png", se
 		width=1400, height=600)
  print(strom_vergleich_plot)
 dev.off()
+}
