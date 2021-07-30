@@ -18,15 +18,15 @@ CSVDATA=`curl -s --request POST \
 		'
 		`
 
-echo "$CSVDATA"
+#echo "$CSVDATA"
 #echo $CSVDATA | awk -F "," '{ print $2 }'
 #echo "$CSVDATA" | awk -F "," '{ print $7 }'
 #echo "$CSVDATA" | awk -v i=2 -v j=3 'NR == i {print $j}'
 #echo "$CSVDATA" | awk 'NR == 2' | awk -F "," '{ print $7 }'
-ABGASTEMP=`echo "$CSVDATA" | awk /getTempAbgas/ | awk -F "," '{ print $7 }'`
-KESSELTEMP=`echo "$CSVDATA" | awk /getTempKist/ | awk -F "," '{ print $7 }'`
-VORLAUFTEMP=`echo "$CSVDATA" | awk /getTempVListM1/ | awk -F "," '{ print $7 }'`
-WWTEMP=`echo "$CSVDATA" | awk /getTempWWist/ | awk -F "," '{ print $7 }'`
+ABGASTEMP=`echo "$CSVDATA" | awk /getTempAbgas/ | awk -F "," '{ print $7;exit; }'`
+KESSELTEMP=`echo "$CSVDATA" | awk /getTempKist/ | awk -F "," '{ print $7;exit; }'`
+VORLAUFTEMP=`echo "$CSVDATA" | awk /getTempVListM1/ | awk -F "," '{ print $7;exit; }'`
+WWTEMP=`echo "$CSVDATA" | awk /getTempWWist/ | awk -F "," '{ print $7;exit; }'`
 
 echo $ABGASTEMP > /var/tmp/abgastemp
 echo $KESSELTEMP > /var/tmp/kesseltemp
