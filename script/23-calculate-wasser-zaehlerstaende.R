@@ -64,6 +64,6 @@ df_m3 <- dat %>%
 				# NT_stand_cum = cumsum(NT)/1000 + 9269
 				 ) %>%
 	arrange(desc(datum)) %>%
-	#select(datum, m3_cum) %>%
+	select(datum, m3_cum) %>%
   write_tsv(file=paste(cachedirprefix, filedateprefix, "-zaehlerstande-wasser_errechnet.csv", sep=""))
 
