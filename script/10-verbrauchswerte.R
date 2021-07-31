@@ -414,3 +414,89 @@ png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_jahrmonat_stack
 		width=850, height=700)
  print(kostenplot3)
 dev.off()
+
+
+##############################
+cat("Kosten auf Quartale aggregieren \n")
+##############################
+
+df2_quartal <- df2 %>%
+	mutate(quartal = as.factor(paste(format(datum, format="%Y"),quarter(datum), sep="_Q"))
+				 ) %>%
+	group_by(quartal) %>%
+	summarise(
+						bezug_strom_ht = sum(bezug_strom_ht),
+						bezug_strom_nt = sum(bezug_strom_nt),
+						bezug_strom_sdl_kev_abgaben = sum(bezug_strom_sdl_kev_abgaben),
+						bezug_gas = sum(bezug_gas),
+						bezug_wasser = sum(bezug_wasser),
+						bezug_abwasser = sum(bezug_abwasser),
+						#tage = n(),
+						grund_wasser = sum(grundpreis_wasser),
+						grund_abwasser = sum(grundpreis_abwasser),
+						grund_strom = sum(grundpreis_strom),
+						grund_gas = sum(grundpreis_gas),
+						#grund_wasser = unique(preis_grund_wasser)*100,
+						#grund_strom = unique(preis_grund_strom)*100,
+						#grund_gas = unique(preis_grund_gas)*100,
+						summe_kosten = bezug_strom_ht +
+										bezug_strom_nt + 
+										bezug_strom_sdl_kev_abgaben +
+										bezug_gas +
+										bezug_wasser +
+										bezug_abwasser +
+										grund_wasser +
+										grund_abwasser +
+										grund_strom +
+										grund_gas
+						)
+
+dfplot2 <- df2_quartal %>%
+		melt(id.vars=c('quartal')) %>%
+		mutate(group = case_when(
+														 grepl('strom',variable) ~ 'Strom',
+														 grepl('wasser', variable) ~ 'Wasser',
+														 #grepl('gas', variable) ~ 'Gas [m3 und kWh]'
+														 grepl('gas', variable) ~ 'Gas'
+														 ),
+		       value_Fr = value/100
+		) %>%
+		filter(!(is.na(group)))
+
+dfplot2_ann <- df2_quartal %>%
+		select(quartal, summe_kosten)
+
+
+kostenplot2 <- ggplot(dfplot2) +
+	geom_col(aes(x=quartal, y=value_Fr, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
+	#scale_colour_identity() +
+	facet_wrap(~group, ncol=1, scales='free_y') +
+	theme_verbrauch() +
+	theme(axis.text.x=element_text(angle=90)) +
+	labs(title="Verbrauchskosten OD10, Quartale",
+	     y = 'Wert in Fr.',
+			 x = 'Jahr-Quartal'
+			 )
+
+png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_quartal.png", sep=''),
+		width=750, height=700)
+ print(kostenplot2)
+dev.off()
+
+kostenplot3 <- ggplot(dfplot2) +
+	geom_col(aes(x=quartal, y=value_Fr, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
+	#scale_colour_identity() +
+	#facet_wrap(~group, ncol=1, scales='free_y') +
+	geom_text(data=dfplot2_ann, aes(x=quartal, y=(summe_kosten/100)+5,label=round(summe_kosten/100, digits=2)), cex=5) +
+	theme_verbrauch() +
+	theme(axis.text.x=element_text(angle=90)) +
+	labs(title="Verbrauchskosten OD10 gesamt, Quartale (inkl. Abwasser)",
+	     y = 'Wert in Fr.',
+			 x = 'Jahr-Quartal'
+			 )
+
+png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_quartal_stack.png", sep=''),
+		width=850, height=700)
+ print(kostenplot3)
+dev.off()
+
