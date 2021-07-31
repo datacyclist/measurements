@@ -6,36 +6,54 @@
 INFLUX_TOKEN=`cat influx_token`
 API_KEY_TS=`cat thingspeak_apikey`
 
-# Daten von Heizung abholen, alles auf einmal :-)
-#MESSWERTE=`/usr/local/bin/vclient -m -c 'getTempWWist,getTempWWsoll,getTempKist,getTempAged,getTempA,\
-#getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
-#getPumpeStatusM1,getPumpeDrehzahlIntern,getBetriebArt,getTempVListM1,getTempVLsollM1,getTempRL17A,getTempAbgas '`
-#
-#echo $MESSWERTE
+########################################
+# Daten holen
+########################################
+
 # Daten von Sensor holen
 MESSWERTEAUSSEN=`./get_sensor_bmp085.py`
 MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 
-# umformatieren
+# Daten von powermeter-A/C im Estrich holen
+factor=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
+voltage=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
+current=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
 
-#echo $MESSWERTE
+# I love bc :-)
+power=`echo "$factor*$voltage*$current" | bc`
 
-# vorher
-# getTempAged.value 8.500000
+#dt=$(date '+%Y-%m-%d %H:%M:%S')
+#echo $dt $power $factor $voltage $current
 
-# nachher
-# getTempAged value=8.500000
+#MESSWERTEAUSSEN=`./get_sensor_bmp085.py`
+#MESSWERTEKELLER=`./get_sensor_DS18B20.py`
+
+##############################
+# Daten formatieren
+##############################
+
+# umformatieren, Beschreibung der Zahlenwerte dazu
+
+ACPOWER=`echo AC_power value=$power`
+ACVOLTAGE=`echo AC_voltage value=$voltage`
+ACCURRENT=`echo AC_current value=$current`
+ACFACTOR=`echo AC_factor value=$factor`
 
 # alle Messwerte hintereinander
-MESSWERTE="$MESSWERTEAUSSEN $MESSWERTEKELLER"
+MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR`
+#
 
-#echo $MESSWERTE
+# echo $MESSWERTE
+
 
 # Messwertzeilen durch \n getrennt
 
-MESS=`echo $MESSWERTE | sed 's/ airpressure/\nairpressure/g;s/ basement/\nbasement/g' `
+MESS=`echo $MESSWERTE | sed 's/ airpressure/\nairpressure/g;s/ basement/\nbasement/g;s/ AC/\nAC/g' `
 
-#echo $MESS
+
+#### Messwertzeilen durch \n getrennt
+
+# echo $MESS
 
 # such a mess...
 
@@ -58,10 +76,10 @@ sleep 30s
 
 #echo $MESSWERTEAUSSEN
 TEMPERATUR_SUEDSEITE=`echo $MESSWERTEAUSSEN | sed 's/.*temperature_sth\svalue=\(-*[0-9]*[0-9].[0-9]\).*air.*/\1/'`
-echo $TEMPERATUR_SUEDSEITE
+#echo $TEMPERATUR_SUEDSEITE
 
 LUFTDRUCK=`echo $MESSWERTEAUSSEN | sed 's/.*airpressure\svalue=\([0-9]*[0-9][0-9][0-9].[0-9]\).*/\1/'`
-echo $LUFTDRUCK
+#echo $LUFTDRUCK
 
 #TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\(-*[0-9][0-9].[0-9]\).*getTempWWsoll.*/\1/'`
 #echo $TEMPERATUR_NORDSEITE
