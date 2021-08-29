@@ -17,6 +17,10 @@ vclient -c 'setTempWWsoll 35'
 - getTempAged
 - getTempWWist
 - getTempWWsoll und 'setTempWWsoll xx'
+- getBetriebArtM1
+- setBetriebArtM1:
+    'setBetriebArtM1 NORM' (H+WW) 
+    'setBetriebArt RED' (WW)
 - getTempStp2
 - getSpeichervorrang
 - getTempKOffset
@@ -35,7 +39,6 @@ vclient -c 'setTempWWsoll 35'
 - getTempRaumNorSollM1 und set...
 - getPumpeStatusM1
 - getPumpeDrehzahlIntern
-- getBetriebArt
 - getAnlagenschema
 
 
