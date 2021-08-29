@@ -19,8 +19,8 @@ vclient -c 'setTempWWsoll 35'
 - getTempWWsoll und 'setTempWWsoll xx'
 - getBetriebArtM1
 - setBetriebArtM1:
-    'setBetriebArtM1 NORM' (H+WW) 
-    'setBetriebArt RED' (WW)
+    - 'setBetriebArtM1 NORM' (H+WW) 
+    - 'setBetriebArt RED' (WW)
 - getTempStp2
 - getSpeichervorrang
 - getTempKOffset
