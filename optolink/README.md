@@ -41,4 +41,9 @@ vclient -c 'setTempWWsoll 35'
 - getPumpeDrehzahlIntern
 - getAnlagenschema
 
+## auxiliary files
 
+Both needed for the vcontrold daemon.
+
+- vcontrold.xml
+- vito.xml
