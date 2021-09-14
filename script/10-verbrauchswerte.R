@@ -165,7 +165,7 @@ dfplot <- df1 %>%
 verbrauchsplot <- ggplot(dfplot) +
 	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
 	scale_colour_identity() +
-	scale_fill_brewer(type='qual', direction=1) +
+	scale_fill_brewer(type='qual', palette='Set2', direction=1) +
 	facet_wrap(~group, ncol=1, scales='free_y') +
 	theme_verbrauch() +
 	labs(title=paste("Abnahmemengen OD10 im Zeitverlauf, generiert ", filedateprefix, sep=""),
@@ -251,7 +251,7 @@ verbrauchsplot1 <- ggplot(dfplot1) +
 	geom_text(data=dfplot1_ann, aes(x=JahrMonat, y=0, vjust=-0.5,
 																	label=label)) +
 	facet_wrap(~group, ncol=1, scales='free_y') +
-	scale_fill_brewer(type='qual', direction=-1) +
+	scale_fill_brewer(type='qual', palette='Set2', direction=-1) +
 	theme_verbrauch() +
 	theme(axis.text.x=element_text(angle=90)) +
 	labs(title=paste("Abnahmemengen OD10, Monate, generiert ", filedateprefix, sep=""),
@@ -313,11 +313,11 @@ dfplot2 <- df2 %>%
 kostenplot <- ggplot(dfplot2) +
 	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
 	scale_colour_identity() +
-	annotate("text", x=min(dfplot2$datum), y=900, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
-	annotate("text", x=min(dfplot2$datum), y=850, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
+	annotate("text", x=min(dfplot2$datum), y=1000, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
+	annotate("text", x=min(dfplot2$datum), y=950, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
 	scale_y_continuous(limits=c(0,1000)) +
-	#scale_fill_brewer(type='qual') +
 	scale_fill_brewer(type='div') +
+	#scale_fill_brewer(type='div', palette='Set2') +
 	theme_verbrauch() +
 	labs(title=paste("Kosten Energie/Wasser OD10 im Zeitverlauf, generiert ", filedateprefix, sep=""),
 	     y = 'Rp. pro Tag',
@@ -496,7 +496,7 @@ kostenplot3 <- ggplot(dfplot2) +
 			 )
 
 png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_quartal_stack.png", sep=''),
-		width=850, height=700)
+		width=1050, height=700)
  print(kostenplot3)
 dev.off()
 
