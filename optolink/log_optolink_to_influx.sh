@@ -15,7 +15,7 @@ MESSWERTE=`/usr/local/bin/vclient -m -c 'getTempWWist,getTempWWsoll,getTempKist,
 getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
 getPumpeStatusM1,getPumpeDrehzahlIntern,getBetriebArt,getTempVListM1,getTempVLsollM1,getTempRL17A,getTempAbgas '`
 
-echo $MESSWERTE
+#echo $MESSWERTE
 
 # umformatieren
 
@@ -61,7 +61,7 @@ TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\([0-9]*[0
 
 TEMPERATUR_HWR=`cat /var/tmp/bmp280_temperature`
 
-curl -X GET -G https://api.thingspeak.com/update \
+curl -k -X GET -G https://api.thingspeak.com/update \
 	-d "api_key=$API_KEY_TS" \
 	-d "field1=$TEMPERATUR_NORDSEITE" \
 	-d "field2=$TEMPERATUR_WARMWASSER" \
