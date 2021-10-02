@@ -3,7 +3,8 @@
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token_read`
 
-CSVDATA=`curl -s --request POST \
+# curl ohne Zertifikatprüfung: -k
+CSVDATA=`curl -s -k --request POST \
  "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/query?org=influx@georgruss.ch"\
   --header "Authorization: Token $INFLUX_TOKEN"\
 	--header "Accept: application/csv" \
