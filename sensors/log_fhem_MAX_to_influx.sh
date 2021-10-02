@@ -82,8 +82,9 @@ do
 done
 
 # So, jetzt alles nach InfluxDB abkippen, friss und stirb :-)
+# (curl ohne Zertifikat-Pruefung: -k)
 echo "$CURL_INFLUX_LOG" | 
-curl -i -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=s"\
+curl -k -i -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=s"\
    	   --header "Authorization: Token $INFLUX_TOKEN"\
             --data-binary @-
 
