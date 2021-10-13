@@ -15,6 +15,8 @@ MESSWERTE=`/usr/local/bin/vclient -m -c 'getTempWWist,getTempWWsoll,getTempKist,
 getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
 getPumpeStatusM1,getPumpeDrehzahlIntern,getBetriebArt,getTempVListM1,getTempVLsollM1,getTempRL17A,getTempAbgas '`
 
+#echo $MESSWERTE
+
 # umformatieren
 
 # vorher
@@ -33,9 +35,11 @@ MESS=`echo $MESSWERTE | sed 's/ get/\nget/g;s/.value\ / value=/g' `
 # Daten in influxdb POSTen
 ##############################
 
-curl -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=ms"\
+curl -k -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=ms"\
 	          --header "Authorization: Token $INFLUX_TOKEN"\
             --data-raw "$MESS"
+
+# (curl ohne Zertifikatprüfung: -k)
 
 ##############################
 # Daten in File ablegen zwecks Auswertung in R
@@ -57,7 +61,7 @@ TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\([0-9]*[0
 
 TEMPERATUR_HWR=`cat /var/tmp/bmp280_temperature`
 
-curl -X GET -G https://api.thingspeak.com/update \
+curl -k -X GET -G https://api.thingspeak.com/update \
 	-d "api_key=$API_KEY_TS" \
 	-d "field1=$TEMPERATUR_NORDSEITE" \
 	-d "field2=$TEMPERATUR_WARMWASSER" \
