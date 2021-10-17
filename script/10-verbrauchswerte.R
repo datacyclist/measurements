@@ -329,6 +329,43 @@ png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf.png", sep=''),
  print(kostenplot)
 dev.off()
 
+#####################################
+cat("Nur letzte 30 Tage anschauen\n")
+#####################################
+
+filterdate <- format(Sys.time()-days(30), "%Y-%m-%d")
+
+dfplot2_30days <- df2 %>%
+		filter(datum >= filterdate) %>%
+		select(datum, abgelesen_flag, starts_with(c('grundpreis', 'bezug'))) %>%
+		melt(id.vars=c('datum', 'abgelesen_flag')) %>%
+		mutate(group = case_when(
+														 grepl('bezug',variable) ~ 'Verbrauch',
+														 grepl('grundpreis', variable) ~ 'Fixkosten'
+														 ),
+					abgelesen_colour = as.factor(ifelse(abgelesen_flag, 'black', 'gray')),
+					variable = fct_reorder(variable, desc(variable))
+					)
+
+kostenplot_30days <- ggplot(dfplot2_30days) +
+	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
+	scale_colour_identity() +
+	#annotate("text", x=min(dfplot2$datum), y=1000, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
+	#annotate("text", x=min(dfplot2$datum), y=950, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
+	scale_y_continuous(limits=c(0,1000)) +
+	scale_fill_brewer(type='div') +
+	#scale_fill_brewer(type='div', palette='Set2') +
+	theme_verbrauch() +
+	labs(title=paste("Kosten Energie/Wasser OD10 letzte 30 Tage, generiert ", filedateprefix, sep=""),
+	     y = 'Rp. pro Tag',
+			 x = 'Datum'
+	)
+
+png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf-30tage.png", sep=''),
+		width=1400, height=600)
+ print(kostenplot_30days)
+dev.off()
+
 ##############################
 cat("Kosten auf Monate aggregieren \n")
 ##############################
@@ -365,7 +402,7 @@ df2_monate <- df2 %>%
 										grund_gas
 						)
 
-dfplot2 <- df2_monate %>%
+dfplot3 <- df2_monate %>%
 		#select(JahrMonat, starts_with('verbrauch')) %>%
 		melt(id.vars=c('JahrMonat')) %>%
 		mutate(group = case_when(
@@ -378,11 +415,11 @@ dfplot2 <- df2_monate %>%
 		) %>%
 		filter(!(is.na(group)))
 
-dfplot2_ann <- df2_monate %>%
+dfplot3_ann <- df2_monate %>%
 		select(JahrMonat, summe_kosten)
 
 
-kostenplot2 <- ggplot(dfplot2) +
+kostenplot2 <- ggplot(dfplot3) +
 	geom_col(aes(x=JahrMonat, y=value_Fr, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
 	#scale_colour_identity() +
 	facet_wrap(~group, ncol=1, scales='free_y') +
@@ -398,11 +435,11 @@ png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_jahrmonat.png",
  print(kostenplot2)
 dev.off()
 
-kostenplot3 <- ggplot(dfplot2) +
+kostenplot3 <- ggplot(dfplot3) +
 	geom_col(aes(x=JahrMonat, y=value_Fr, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
 	#scale_colour_identity() +
 	#facet_wrap(~group, ncol=1, scales='free_y') +
-	geom_text(data=dfplot2_ann, aes(x=JahrMonat, y=(summe_kosten/100)+5,label=round(summe_kosten/100, digits=2)), cex=5) +
+	geom_text(data=dfplot3_ann, aes(x=JahrMonat, y=(summe_kosten/100)+5,label=round(summe_kosten/100, digits=2)), cex=5) +
 	theme_verbrauch() +
 	theme(axis.text.x=element_text(angle=90)) +
 	labs(title="Verbrauchskosten OD10 gesamt, Monate",
@@ -451,7 +488,7 @@ df2_quartal <- df2 %>%
 										grund_gas
 						)
 
-dfplot2 <- df2_quartal %>%
+dfplot4 <- df2_quartal %>%
 		melt(id.vars=c('quartal')) %>%
 		mutate(group = case_when(
 														 grepl('strom',variable) ~ 'Strom',
@@ -463,11 +500,11 @@ dfplot2 <- df2_quartal %>%
 		) %>%
 		filter(!(is.na(group)))
 
-dfplot2_ann <- df2_quartal %>%
+dfplot4_ann <- df2_quartal %>%
 		select(quartal, summe_kosten)
 
 
-kostenplot2 <- ggplot(dfplot2) +
+kostenplot2 <- ggplot(dfplot4) +
 	geom_col(aes(x=quartal, y=value_Fr, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
 	#scale_colour_identity() +
 	facet_wrap(~group, ncol=1, scales='free_y') +
@@ -483,11 +520,11 @@ png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_quartal.png", s
  print(kostenplot2)
 dev.off()
 
-kostenplot3 <- ggplot(dfplot2) +
+kostenplot3 <- ggplot(dfplot4) +
 	geom_col(aes(x=quartal, y=value_Fr, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
 	#scale_colour_identity() +
 	#facet_wrap(~group, ncol=1, scales='free_y') +
-	geom_text(data=dfplot2_ann, aes(x=quartal, y=(summe_kosten/100)+5,label=round(summe_kosten/100, digits=2)), cex=5) +
+	geom_text(data=dfplot4_ann, aes(x=quartal, y=(summe_kosten/100)+5,label=round(summe_kosten/100, digits=2)), cex=5) +
 	theme_verbrauch() +
 	theme(axis.text.x=element_text(angle=90)) +
 	labs(title="Verbrauchskosten OD10 gesamt, Quartale (inkl. Abwasser)",
