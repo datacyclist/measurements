@@ -148,6 +148,10 @@ cat("Verbrauchsmengen und Plot dazu \n")
 #	fill(verbrauch_strom_gesamt_pro_tag, .direction='up') %>%
 #	mutate(abgelesen_flag = ifelse(is.na(timestamp_orig), FALSE, TRUE))
 
+##############################
+# Abnahmemengen pro Tag, gesamter Zeitraum
+##############################
+
 dfplot <- df1 %>%
 		select(datum, abgelesen_flag, starts_with('verbrauch')) %>%
 		melt(id.vars=c('datum', 'abgelesen_flag')) %>%
@@ -178,7 +182,83 @@ png(filename=paste(figdirprefix, filedateprefix, "_verbrauchsverlauf.png", sep='
  print(verbrauchsplot)
 dev.off()
 
-# alles auf Monate aggregieren
+##############################
+# Abnahmemengen pro Tag, nur letzte 365 Tage
+##############################
+filterdate <- format(Sys.time()-days(365), "%Y-%m-%d")
+
+dfplotverbrauch_365days <- df1 %>%
+		filter(datum >= filterdate) %>%
+		select(datum, abgelesen_flag, starts_with('verbrauch')) %>%
+		melt(id.vars=c('datum', 'abgelesen_flag')) %>%
+		filter(variable != 'verbrauch_strom_gesamt_pro_tag') %>%	
+		#filter(!(is.na(value))) %>%
+		mutate(group = case_when(
+														 grepl('strom',variable) ~ 'Strom [kWh]',
+														 grepl('wasser', variable) ~ 'Wasser [Liter]',
+														 #grepl('gas', variable) ~ 'Gas [m3 und kWh]'
+														 grepl('gas', variable) ~ 'Gas [kWh]'
+														 ) ,
+					abgelesen_colour = as.factor(ifelse(abgelesen_flag, 'black', 'gray'))
+		)
+
+verbrauchsplot <- ggplot(dfplotverbrauch_365days) +
+	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
+	scale_colour_identity() +
+	scale_fill_brewer(type='qual', palette='Set2', direction=1) +
+	facet_wrap(~group, ncol=1, scales='free_y') +
+	theme_verbrauch() +
+	labs(title=paste("Abnahmemengen OD10 im Zeitverlauf letzte 365 Tage, generiert ", filedateprefix, sep=""),
+	     y = 'Wert in jew. Einheit [l bzw. kWh]',
+			 x = 'Datum'
+			 )
+
+png(filename=paste(figdirprefix, filedateprefix, "_verbrauchsverlauf_365days.png", sep=''),
+		width=1400, height=600)
+ print(verbrauchsplot)
+dev.off()
+
+##############################
+# Abnahmemengen pro Tag, nur letzte 30 Tage
+##############################
+filterdate <- format(Sys.time()-days(30), "%Y-%m-%d")
+
+dfplotverbrauch_30days <- df1 %>%
+		filter(datum >= filterdate) %>%
+		select(datum, abgelesen_flag, starts_with('verbrauch')) %>%
+		melt(id.vars=c('datum', 'abgelesen_flag')) %>%
+		filter(variable != 'verbrauch_strom_gesamt_pro_tag') %>%	
+		#filter(!(is.na(value))) %>%
+		mutate(group = case_when(
+														 grepl('strom',variable) ~ 'Strom [kWh]',
+														 grepl('wasser', variable) ~ 'Wasser [Liter]',
+														 #grepl('gas', variable) ~ 'Gas [m3 und kWh]'
+														 grepl('gas', variable) ~ 'Gas [kWh]'
+														 ) ,
+					abgelesen_colour = as.factor(ifelse(abgelesen_flag, 'black', 'gray'))
+		)
+
+verbrauchsplot <- ggplot(dfplotverbrauch_30days) +
+	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
+	scale_colour_identity() +
+	scale_fill_brewer(type='qual', palette='Set2', direction=1) +
+	facet_wrap(~group, ncol=1, scales='free_y') +
+	theme_verbrauch() +
+	labs(title=paste("Abnahmemengen OD10 im Zeitverlauf letzte 30 Tage, generiert ", filedateprefix, sep=""),
+	     y = 'Wert in jew. Einheit [l bzw. kWh]',
+			 x = 'Datum'
+			 )
+
+png(filename=paste(figdirprefix, filedateprefix, "_verbrauchsverlauf_30days.png", sep=''),
+		width=1400, height=600)
+ print(verbrauchsplot)
+dev.off()
+
+
+##############################
+# Abnahmemengen auf Monate aggregiert
+##############################
+
 df1_monate <- df1 %>%
 	mutate(JahrMonat = as.factor(format(datum, format = "%Y-%m"))) %>%
 	group_by(JahrMonat) %>%
