@@ -107,6 +107,7 @@ df_days <- df_hours_join %>%
 	summarise(
 						verbrauch_gas_pro_tag_kWh = sum(verbrauch_gas_pro_stunde_kWh, na.rm=TRUE),
 						verbrauch_wasser_pro_tag_l = sum(verbrauch_wasser_pro_stunde_l, na.rm=TRUE),
+						verbrauch_wasser_pro_tag_l = ifelse(verbrauch_wasser_pro_tag_l < 0, 0, verbrauch_wasser_pro_tag_l),
 						verbrauch_strom_ht_pro_tag_kWh = sum(verbrauch_strom_ht_pro_stunde_kWh, na.rm=TRUE),
 						verbrauch_strom_nt_pro_tag_kWh = sum(verbrauch_strom_nt_pro_stunde_kWh, na.rm=TRUE),
 						verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh) %>%
@@ -133,7 +134,7 @@ df_datum_tage_pro_monat_join <- data.frame(datum=seq.Date(as.Date(min(df_days$da
 
 # Tage pro Monat und Jahr-Monat dranhaengen
 df1 <- df_datum_tage_pro_monat_join %>%
-				left_join(df_days, by='datum') 
+				left_join(df_days, by='datum')
 	
 ###############################
 cat("Verbrauchsmengen und Plot dazu \n")
