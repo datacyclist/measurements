@@ -18,8 +18,9 @@ MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 factor=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
 voltage=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
+tempbuero=`curl -s -X GET http://tasmota_02/cm?cmnd=Status%208 | jq -r '.StatusSNS.DS18B20.Temperature'`
 
-# I love bc :-)
+# I love bc :-) Leistung A/C berechnen
 power=`echo "$factor*$voltage*$current" | bc`
 
 #dt=$(date '+%Y-%m-%d %H:%M:%S')
@@ -38,9 +39,10 @@ ACPOWER=`echo AC_power value=$power`
 ACVOLTAGE=`echo AC_voltage value=$voltage`
 ACCURRENT=`echo AC_current value=$current`
 ACFACTOR=`echo AC_factor value=$factor`
+TEMPBUERO=`echo temperature_buero value=$tempbuero`
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR`
+MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $TEMPBUERO`
 #
 
 # echo $MESSWERTE
@@ -48,7 +50,10 @@ MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT
 
 # Messwertzeilen durch \n getrennt
 
-MESS=`echo $MESSWERTE | sed 's/ airpressure/\nairpressure/g;s/ basement/\nbasement/g;s/ AC/\nAC/g' `
+# es wird immer der Anfang einer Messwertbezeichnung gesucht, z.B. " tempbuero"
+# und ersetzt durch "\ntempbuero", also Leerzeichen durch Zeilenumbruch ersetzt
+
+MESS=`echo $MESSWERTE | sed 's/ airpressure/\nairpressure/g;s/ basement/\nbasement/g;s/ AC/\nAC/g;s/ temperature_buero/\ntemperature_buero/g' `
 
 
 #### Messwertzeilen durch \n getrennt
