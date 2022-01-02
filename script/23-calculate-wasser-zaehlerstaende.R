@@ -50,6 +50,11 @@ dfquartal <- read_tsv("../csv/quartalsabrechnung.csv",
 dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*wasserzaehler-ping.csv", full.names=TRUE) %>%
 			map_df(~read_csv(.,col_names=FALSE))
 
+# da der Wasserverbrauch auch mal null sein kann, sollen später für diese Nullverbrauchstage 
+# trotzdem Zeilen angelegt werden
+dummytage <- data.frame( datum = ymd(seq.Date(as.Date(min(dat$X1)),as.Date(max(dat$X1)), by='days'))) %>%
+				arrange(desc(datum))
+
 # Zählerstände werden per Offset (aus offiziellen Quartalsabrechnungen) und
 # cumsum errechnet
 
@@ -92,13 +97,20 @@ df_m3 <- dat %>%
 				 korrekturfaktor_quartal = ifelse(is.na(korrekturfaktor_quartal),1,korrekturfaktor_quartal),
 
 				 # korrigiere jeden einzelnen Tageswert
-				 l_korrigiert = l*korrekturfaktor_quartal,
+				 l_korrigiert = round(l*korrekturfaktor_quartal,digits=0),
 
 				 # berechne daraus den korrigierten Zählerstand
 				 m3_cum_korrigiert = round(cumsum(l_korrigiert)/1000+endstand_vorquartal, digits=2)
 				 ) %>%
 	ungroup() %>%
 	arrange(desc(datum)) %>%
-	select(datum, m3_cum_korrigiert, m3_cum) %>%
+	select(datum, m3_cum_korrigiert, l_korrigiert)
+
+	# Fehlende Tage via join ergänzen und Zählerstand bzw. Tagesverbrauch nachführen
+
+	df_m3 <- dummytage %>%
+					left_join(df_m3) %>%
+					fill(m3_cum_korrigiert,.direction='up') %>%
+					mutate(l_korrigiert = replace_na(l_korrigiert, 0)) %>%
   write_tsv(file=paste(cachedirprefix, filedateprefix, "-zaehlerstande-wasser_errechnet.csv", sep=""))
 
