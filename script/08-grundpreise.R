@@ -53,4 +53,4 @@ preise2020 <- data.frame(jahr=2020) %>%
 												 preis_grund_abwasser = 4.00/(1+mwst2), #Fr. pro Monat
 												 )
 
-dfpreise <- rbind(preise2020,preise2021)
+dfpreise <- rbind(preise2020,preise2021,preise2022)
