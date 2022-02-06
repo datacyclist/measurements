@@ -44,7 +44,8 @@ dat2 <- read_tsv(file=paste(csvdirprefix, "ablesewerte-zum-eintragen.csv", sep="
 # ...zusammenhängen (Reihenfolge von dat1 vorher an dat2 anpassen)
 dat <- dat1 %>%
 	select(timestamp,strom_tag, strom_nacht, gas, wasser, kommentar) %>%
-	rbind(dat2)
+	rbind(dat2) %>%
+	arrange(timestamp)
 	
 
 ##############################
@@ -52,7 +53,6 @@ dat <- dat1 %>%
 ##############################
 
 df_abgelesen_logical <- dat %>%
-	arrange(timestamp) %>%
 	mutate(
 				 timestamp_day = format(timestamp, format = "%Y-%m-%d")
 				 ) %>%
@@ -65,7 +65,6 @@ cat(" Daten vorbearbeiten und bereinigen -- auf Stundenbasis runterbrechen \n")
 ########################################
 
 df_hours <- dat %>%
-	arrange(timestamp) %>%
 	mutate(
 				 diff_h = interval(lag(timestamp),timestamp)/hours(1),
 				 diff_gas = gas - lag(gas),
@@ -105,11 +104,11 @@ df_days <- df_hours_join %>%
 				) %>%
 	group_by(timestamp_day) %>%
 	summarise(
-						verbrauch_gas_pro_tag_kWh = sum(verbrauch_gas_pro_stunde_kWh, na.rm=TRUE),
+						verbrauch_gas_pro_tag_kWh = round(sum(verbrauch_gas_pro_stunde_kWh, na.rm=TRUE),digits=3),
 						verbrauch_wasser_pro_tag_l = sum(verbrauch_wasser_pro_stunde_l, na.rm=TRUE),
-						verbrauch_wasser_pro_tag_l = ifelse(verbrauch_wasser_pro_tag_l < 0, 0, verbrauch_wasser_pro_tag_l),
-						verbrauch_strom_ht_pro_tag_kWh = sum(verbrauch_strom_ht_pro_stunde_kWh, na.rm=TRUE),
-						verbrauch_strom_nt_pro_tag_kWh = sum(verbrauch_strom_nt_pro_stunde_kWh, na.rm=TRUE),
+						verbrauch_wasser_pro_tag_l = round(ifelse(verbrauch_wasser_pro_tag_l < 0, 0, verbrauch_wasser_pro_tag_l),digits=1),
+						verbrauch_strom_ht_pro_tag_kWh = round(sum(verbrauch_strom_ht_pro_stunde_kWh, na.rm=TRUE),digits=3),
+						verbrauch_strom_nt_pro_tag_kWh = round(sum(verbrauch_strom_nt_pro_stunde_kWh, na.rm=TRUE),digits=3),
 						verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh) %>%
 	ungroup()  %>%
 	left_join(df_abgelesen_logical, by='timestamp_day') %>%
@@ -184,8 +183,9 @@ png(filename=paste(figdirprefix, filedateprefix, "_verbrauchsverlauf.png", sep='
 dev.off()
 
 ##############################
-# Abnahmemengen pro Tag, nur letzte 365 Tage
+cat("Abnahmemengen pro Tag, nur letzte 365 Tage\n")
 ##############################
+
 filterdate <- format(Sys.time()-days(365), "%Y-%m-%d")
 
 dfplotverbrauch_365days <- df1 %>%
@@ -220,7 +220,7 @@ png(filename=paste(figdirprefix, filedateprefix, "_verbrauchsverlauf_365days.png
 dev.off()
 
 ##############################
-# Abnahmemengen pro Tag, nur letzte 30 Tage
+cat("Abnahmemengen pro Tag, nur letzte 30 Tage\n")
 ##############################
 filterdate <- format(Sys.time()-days(30), "%Y-%m-%d")
 
@@ -257,7 +257,7 @@ dev.off()
 
 
 ##############################
-# Abnahmemengen auf Monate aggregiert
+cat("Abnahmemengen auf Monate aggregiert\n")
 ##############################
 
 df1_monate <- df1 %>%
@@ -392,10 +392,11 @@ dfplot2 <- df2 %>%
 		)
 
 kostenplot <- ggplot(dfplot2) +
-	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
+	#geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
+	geom_col(aes(x=datum, y=value, group=variable, fill=variable), position='stack', size=0.3) +
 	scale_colour_identity() +
-	annotate("text", x=min(dfplot2$datum), y=1000, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
-	annotate("text", x=min(dfplot2$datum), y=950, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
+	#annotate("text", x=min(dfplot2$datum), y=1000, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
+	#annotate("text", x=min(dfplot2$datum), y=950, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
 	scale_y_continuous(limits=c(0,1000)) +
 	scale_fill_brewer(type='div') +
 	#scale_fill_brewer(type='div', palette='Set2') +
