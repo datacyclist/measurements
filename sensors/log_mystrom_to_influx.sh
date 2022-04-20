@@ -12,8 +12,12 @@ API_KEY_TS=`cat thingspeak_apikey`
 
 # Daten von mystrom-powermeter 192.168.0.45 (HWR: NAS+RASPIS) holen
 power_mystrom_HWR=`curl -s -X GET http://192.168.0.45/report | jq -r '.power'`
+# Daten von mystrom-powermeter 192.168.0.46 (PC) holen
+power_mystrom_PC=`curl -s -X GET http://192.168.0.46/report | jq -r '.power'`
 # Daten von mystrom-powermeter 192.168.0.47 (Wohnzimmer: Glasfaser/Router/VPN) holen
 power_mystrom_WZ=`curl -s -X GET http://192.168.0.47/report | jq -r '.power'`
+# Daten von mystrom-powermeter 192.168.0.55 (Wohnzimmer: Projektor) holen
+power_mystrom_Proj=`curl -s -X GET http://192.168.0.55/report | jq -r '.power'`
 
 ## #dt=$(date '+%Y-%m-%d %H:%M:%S')
 ## #echo $dt $power $factor $voltage $current
@@ -25,10 +29,12 @@ power_mystrom_WZ=`curl -s -X GET http://192.168.0.47/report | jq -r '.power'`
 ## # umformatieren, Beschreibung der Zahlenwerte dazu
 ## 
 POWER_HWR=`echo power_HWR value=$power_mystrom_HWR`
+POWER_PC=`echo power_PC value=$power_mystrom_PC`
 POWER_WZ=`echo power_WZ value=$power_mystrom_WZ`
+POWER_PROJ=`echo power_PROJ value=$power_mystrom_Proj`
  
 ## # alle Messwerte hintereinander
-MESSWERTE=`echo $POWER_HWR $POWER_WZ`
+MESSWERTE=`echo $POWER_HWR $POWER_PC $POWER_WZ $POWER_PROJ`
 ## #
 ## 
 # echo $MESSWERTE
