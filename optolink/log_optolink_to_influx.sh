@@ -11,7 +11,7 @@ TIMESTAMP=`date +"%s"`
 FILEDATE=`date +"%Y%m%d"`
 
 # Daten von Heizung abholen, alles auf einmal :-)
-MESSWERTE=`/usr/local/bin/vclient -m -c 'getTempWWist,getTempWWsoll,getTempKist,getTempAged,getTempA,\
+MESSWERTE=`/usr/bin/vclient -m -c 'getTempWWist,getTempWWsoll,getTempKist,getTempAged,getTempA,\
 getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
 getPumpeStatusM1,getPumpeDrehzahlIntern,getBetriebArt,getTempVListM1,getTempVLsollM1,getTempRL17A,getTempAbgas '`
 
@@ -59,12 +59,13 @@ TEMPERATUR_NORDSEITE=`echo $MESSWERTE | sed 's/.*getTempA.value\s\(-*[0-9]*[0-9]
 TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\([0-9]*[0-9].[0-9]\).*getTempWWsoll.*/\1/'`
 #echo $TEMPERATUR_NORDSEITE
 
-TEMPERATUR_HWR=`cat /var/tmp/bmp280_temperature`
+#TEMPERATUR_HWR=`cat /var/tmp/bmp280_temperature`
 
 curl -k -X GET -G https://api.thingspeak.com/update \
 	-d "api_key=$API_KEY_TS" \
 	-d "field1=$TEMPERATUR_NORDSEITE" \
 	-d "field2=$TEMPERATUR_WARMWASSER" \
-	-d "field3=$TEMPERATUR_HWR" \
     	--header "Content-type: application/x-www-form-urlencoded" \
  	--header "Accept: text/plain"
+
+#	-d "field3=$TEMPERATUR_HWR" \
