@@ -30,12 +30,15 @@ thermostate=( MAX_00a661 MAX_008bb8 MAX_008cd0 MAX_008d29 MAX_00904d MAX_009363 
 # Variable leer initialisieren
 CURL_INFLUX_LOG=''
 
+# Jahr variabel setzen (fiel von 2021 auf 2022 auf :-) )
+JAHR=$(date '+%Y')
+
 for MAX_PREFIX in "${thermostate[@]}"
 do
 	#MAX_PREFIX='MAX_0090bf'
 	#echo $MAX_PREFIX
 	
-	LOGSNIPPET=`tail -n 8 /opt/fhem/log/$MAX_PREFIX-2021.log`
+	LOGSNIPPET=`tail -n 8 /opt/fhem/log/$MAX_PREFIX-$JAHR.log`
 	#echo "$LOGSNIPPET"
 	
 	# wichtig: für den Timestamp muss eine Herkunfts-Zeitzone angegeben
