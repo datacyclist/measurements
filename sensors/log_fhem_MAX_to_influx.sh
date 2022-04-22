@@ -25,7 +25,7 @@ INFLUX_TOKEN=`cat influx_token`
 # Daten von Thermostaten aus deren FHEM-Logfiles abholen
 
 # Welche Thermostate?
-thermostate=( MAX_00a661 MAX_008bb8 MAX_008cd0 MAX_008d29 MAX_00904d MAX_009363 MAX_0090bf MAX_00a256 MAX_009404)
+thermostate=( MAX_00a661 MAX_008bb8 MAX_008cd0 MAX_008d29 MAX_00904d MAX_009363 MAX_0090bf MAX_00a256 MAX_009404 MAX_008ca7 )
 
 # Variable leer initialisieren
 CURL_INFLUX_LOG=''
