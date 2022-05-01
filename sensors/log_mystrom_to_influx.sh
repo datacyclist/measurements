@@ -4,7 +4,7 @@
 
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
-API_KEY_TS=`cat thingspeak_apikey`
+#API_KEY_TS=`cat thingspeak_apikey`
 
 ########################################
 # Daten holen
