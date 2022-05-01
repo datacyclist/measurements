@@ -23,10 +23,10 @@ power_therme=`echo "$factor_therme*$voltage_therme*$current_therme" | bc`
 
 # umformatieren, Beschreibung der Zahlenwerte dazu
 
-THERMEPOWER=`echo THERME_power value=$power_therme`
-THERMEVOLTAGE=`echo THERME_voltage value=$voltage_therme`
-THERMECURRENT=`echo THERME_current value=$current_therme`
-THERMEFACTOR=`echo THERME_factor value=$factor_therme`
+THERMEPOWER=`echo power_THERME value=$power_therme`
+THERMEVOLTAGE=`echo voltage_THERME value=$voltage_therme`
+THERMECURRENT=`echo current_THERME value=$current_therme`
+THERMEFACTOR=`echo factor_THERME value=$factor_therme`
 
 # alle Messwerte hintereinander
 MESSWERTE=`echo $THERMEPOWER $THERMEVOLTAGE $THERMECURRENT $THERMEFACTOR`
@@ -37,7 +37,7 @@ MESSWERTE=`echo $THERMEPOWER $THERMEVOLTAGE $THERMECURRENT $THERMEFACTOR`
 # und ersetzt durch "\ntempbuero", also Leerzeichen durch Zeilenumbruch ersetzt
 
 MESS=`echo $MESSWERTE | sed 's/ THERME/\nTHERME/g' `
-echo $MESS
+#echo $MESS
 
 #### Messwertzeilen durch \n getrennt
 
