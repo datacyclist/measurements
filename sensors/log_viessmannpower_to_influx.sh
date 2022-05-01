@@ -5,6 +5,10 @@
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
 
+# timestamp in seconds (see XPOST for the specification of the precision)
+TS=`date +%s`
+#echo $TS
+
 ########################################
 # Daten holen
 ########################################
@@ -28,24 +32,17 @@ THERMEVOLTAGE=`echo voltage_THERME value=$voltage_therme`
 THERMECURRENT=`echo current_THERME value=$current_therme`
 THERMEFACTOR=`echo factor_THERME value=$factor_therme`
 
-# alle Messwerte hintereinander
-MESSWERTE=`echo $THERMEPOWER $THERMEVOLTAGE $THERMECURRENT $THERMEFACTOR`
+# Messwertzeilen durch \n getrennt und auf jeder Zeile mit timestamp
+MESSWERTE=$(printf '%s' "$THERMEPOWER")$' '$(printf '%u' "$TS")$'\n'
+MESSWERTE+=$(printf '%s' "$THERMEVOLTAGE")$' '$(printf '%u' "$TS")$'\n'
+MESSWERTE+=$(printf '%s' "$THERMECURRENT")$' '$(printf '%u' "$TS")$'\n'
+MESSWERTE+=$(printf '%s' "$THERMEFACTOR")$' '$(printf '%u' "$TS")$'\n'
 
-# Messwertzeilen durch \n getrennt
+#echo $MESSWERTE
 
-# es wird immer der Anfang einer Messwertbezeichnung gesucht, z.B. " tempbuero"
-# und ersetzt durch "\ntempbuero", also Leerzeichen durch Zeilenumbruch ersetzt
-
-MESS=`echo $MESSWERTE | sed 's/ THERME/\nTHERME/g' `
-#echo $MESS
-
-#### Messwertzeilen durch \n getrennt
-
-# echo $MESS
-
-# such a mess...
+# Attention: precision of timestamp is specified in the POST request
 
 # Daten in influxdb POSTen
-curl -s -i -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=ms"\
+curl -s -i -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=s"\
 	          --header "Authorization: Token $INFLUX_TOKEN"\
-            --data-raw "$MESS "
+            --data-raw "$MESSWERTE "
