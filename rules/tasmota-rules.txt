@@ -1,0 +1,6 @@
+
+# Rule im Tasmota POWR2 der Gastherme: wenn das Wifi weg geht, nach 45s den Tasmota neustarten
+rule1 on Wifi#Disconnected do backlog delay 45; restart 1; endon on Wifi#Connected do backlog endon
+
+# rule aktivieren
+rule1 1
