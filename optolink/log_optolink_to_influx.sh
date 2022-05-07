@@ -11,7 +11,7 @@ TIMESTAMP=`date +"%s"`
 FILEDATE=`date +"%Y%m%d"`
 
 # Daten von Heizung abholen, alles auf einmal :-)
-MESSWERTE=`/usr/bin/vclient -m -c 'getTempWWist,getTempWWsoll,getTempKist,getTempAged,getTempA,\
+MESSWERTE=`/usr/bin/vclient -h 127.0.0.1:3002 -m -c 'getTempWWist,getTempWWsoll,getTempKist,getTempAged,getTempA,\
 getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
 getPumpeStatusM1,getPumpeDrehzahlIntern,getBetriebArt,getTempVListM1,getTempVLsollM1,getTempRL17A,getTempAbgas '`
 
@@ -42,12 +42,16 @@ curl -k -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write
 # (curl ohne Zertifikatprüfung: -k)
 
 ##############################
-# Daten in File ablegen zwecks Auswertung in R
+# Daten in File ablegen zwecks späterer Auswertung in R
 ##############################
 LOGLINE=$TIMESTAMP" "$MESSWERTE
 
 #echo $MESSWERTE >> ~/mnt/nas/zaehlerlog/gastherme/$DATE-optolinklog.csv
-echo $LOGLINE >> ~/mnt/nas/zaehlerlog/gastherme/$FILEDATE-optolinklog.csv
+
+# nicht mehr aufs NAS loggen, damit dessen Platte runterfahren kann
+# stattdessen in lokales File, das nach Mitternacht per cron/rsync aufs NAS kopiert wird
+#echo $LOGLINE >> ~/mnt/nas/zaehlerlog/gastherme/$FILEDATE-optolinklog.csv
+echo $LOGLINE >> /var/tmp/$FILEDATE-optolinklog.csv
 
 ##############################
 # einzelne Messwerte nach thingspeak loggen
