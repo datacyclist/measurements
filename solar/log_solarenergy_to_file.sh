@@ -9,4 +9,5 @@ dt=$(date '+%Y-%m-%d_%H:%M:%S')
 
 # direkt aufs NAS in ein File loggen
 #echo $dt $solarenergy_panel0_today >> ~/mnt/nas/zaehlerlog/solar/solar_panel0.log
+# lokal in ein File loggen, das periodisch (nachts) aufs NAS rsyncen per cron
 echo $dt $solarenergy_panel0_today >> /var/tmp/solar_panel0.log
