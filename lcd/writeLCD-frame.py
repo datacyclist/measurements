@@ -72,7 +72,7 @@ while True:
     # line2 = "P_solar: " + str(solarleistung) + " W"
     # line3 = "Wasser: " + wasserbezug + " Liter"
     #line4 = "HWR: " + tempHWR + chr(223) + "C " + feuchteHWR + "%"
-    line1 = tempbuero + unichr(223) + "C " + feuchtebuero + "%"
+    line1 = tempbuero + chr(223) + "C " + feuchtebuero + "%"
     line2 = timedate
     
     #print(line1)
