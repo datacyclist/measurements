@@ -1,0 +1,10 @@
+[Unit]
+Description=show data on e-ink display
+After=multi-user.target
+
+[Service]
+WorkingDir=/home/russ/bin/measurements/eink/
+ExecStart=sudo /home/russ/bin/measurements/eink/write_epaper.py
+
+[Install]
+WantedBy=multi-user.target
