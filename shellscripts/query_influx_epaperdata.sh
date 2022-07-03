@@ -98,3 +98,24 @@ CSVDATA=`curl -s -k --request POST \
 SolarW=`echo "$CSVDATA" | awk /_result/ | awk -F "," '{ print $9;exit; }'` 
 # mit awk runden
 echo $SolarW | awk '{print int($1)}' > /var/log/solar_W
+
+# aktuelle Aussentemperatur holen
+CSVDATA=`curl -s -k --request POST \
+ "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/query?org=influx@georgruss.ch"\
+  --header "Authorization: Token $INFLUX_TOKEN"\
+	--header "Accept: application/csv" \
+	--header "Content-type: application/vnd.flux" \
+	--data '
+   from(bucket: "od10_messwerte")
+	|> range(start: -2m)
+	|> truncateTimeColumn(unit: 1m)
+    	|> filter(fn: (r) => r["_measurement"] == "getTempA" or r["_measurement"] == "temperature_sth" )
+	|> lowestMin( n:1, column: "_value", groupColumns: [])
+		'
+		`
+
+# stehenden Wert raus (= derjenige, der an neunter Stelle steht)
+TEMP1=`echo "$CSVDATA" | awk /_result/ | awk -F "," '{ print $9;exit; }'` 
+#echo "$TEMP1" | xargs printf "%.2f \n"
+TEMPROUNDED=`awk -v temp="$TEMP1" 'BEGIN { rounded = sprintf("%.1f", temp); print rounded }'`
+echo $TEMPROUNDED > /var/log/aussentemperatur
