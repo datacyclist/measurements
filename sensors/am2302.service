@@ -1,0 +1,10 @@
+[Unit]
+Description=hum/temp-Sensorauslesung
+After=multi-user.target
+
+[Service]
+WorkingDir=/home/russ/bin/measurements/sensors/
+ExecStart=/usr/bin/python /home/russ/bin/measurements/sensors/get_sensor_AM2302.py
+
+[Install]
+WantedBy=multi-user.target

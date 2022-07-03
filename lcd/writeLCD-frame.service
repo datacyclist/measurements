@@ -1,0 +1,10 @@
+[Unit]
+Description=pipe data to HD44780 i2c LCD
+After=multi-user.target
+
+[Service]
+WorkingDir=/home/russ/bin/measurements/lcd/
+ExecStart=/usr/bin/python /home/russ/bin/measurements/lcd/writeLCD-frame.py
+
+[Install]
+WantedBy=multi-user.target
