@@ -18,10 +18,20 @@ MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 factor=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
 voltage=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
-tempbuero=`curl -s -X GET http://tasmota_02/cm?cmnd=Status%208 | jq -r '.StatusSNS.DS18B20.Temperature'`
 
 # I love bc :-) Leistung A/C berechnen
 power=`echo "$factor*$voltage*$current" | bc`
+
+# tasmota im Buero
+tempbuero=`curl -s -X GET http://192.168.0.75/cm?cmnd=Status%208 | jq -r '.StatusSNS.DS18B20.Temperature'`
+
+# tasmota im Schlafzimmer
+tempbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.DS18B20.Temperature'`
+
+# tasmota Estrich
+tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.Temperature'`
+humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.Humidity'`
+dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.DewPoint'`
 
 # Daten von sonoff powermeter am Solarpanel holen
 factor_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
@@ -48,13 +58,17 @@ ACVOLTAGE=`echo AC_voltage value=$voltage`
 ACCURRENT=`echo AC_current value=$current`
 ACFACTOR=`echo AC_factor value=$factor`
 TEMPBUERO=`echo temperature_buero value=$tempbuero`
+TEMPBETT=`echo temperature_bett value=$tempbett`
+TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
+HUMESTRICH=`echo humidity_estrich value=$humestrich`
+DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
 SOLARPOWER=`echo SOLAR_power value=$power_solar`
 SOLARVOLTAGE=`echo SOLAR_voltage value=$voltage_solar`
 SOLARCURRENT=`echo SOLAR_current value=$current_solar`
 SOLARFACTOR=`echo SOLAR_factor value=$factor_solar`
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $TEMPBUERO`
+MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $TEMPBUERO $TEMPBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
 #
 
 # echo $MESSWERTE
@@ -65,12 +79,12 @@ MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT
 # es wird immer der Anfang einer Messwertbezeichnung gesucht, z.B. " tempbuero"
 # und ersetzt durch "\ntempbuero", also Leerzeichen durch Zeilenumbruch ersetzt
 
-MESS=`echo $MESSWERTE | sed 's/ airpressure/\nairpressure/g;s/ basement/\nbasement/g;s/ AC/\nAC/g;s/ SOLAR/\nSOLAR/g;s/ temperature_buero/\ntemperature_buero/g' `
+MESS=`echo $MESSWERTE | sed 's/ airpressure/\nairpressure/g;s/ basement/\nbasement/g;s/ AC/\nAC/g;s/ SOLAR/\nSOLAR/g;s/ temp/\ntemp/g;s/ hum/\nhum/g;s/ dew/\ndew/g' `
 
 
 #### Messwertzeilen durch \n getrennt
 
-# echo $MESS
+#echo $MESS
 
 # such a mess...
 
