@@ -2,6 +2,9 @@
 
 # script läuft auf host smartmeter
 
+# deprecated! Alle Werte werden in einem gemeinsamen Script log_sensoren_to_influx.sh 
+# in einem einzigen Request an Influx abgeschickt
+
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
 #API_KEY_TS=`cat thingspeak_apikey`
@@ -34,7 +37,7 @@ ACENERGYTODAY=`echo AC_energytoday value=$energytoday`
 ## alle Messwerte hintereinander
 MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGYTODAY`
 #
-#echo $MESSWERTE
+echo $MESSWERTE
 
 #### Messwertzeilen durch \n getrennt
 MESS=`echo $MESSWERTE | sed 's/ AC/\nAC/g' `
