@@ -15,6 +15,7 @@ MESSWERTEAUSSEN=`./get_sensor_bmp085.py`
 MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 
 # Daten von powermeter-A/C im Estrich holen
+energytoday=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
 factor=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
 voltage=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
@@ -34,6 +35,7 @@ humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.Stat
 dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.DewPoint'`
 
 # Daten von sonoff powermeter am Solarpanel holen
+energy_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
 factor_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
 voltage_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
@@ -57,6 +59,7 @@ ACPOWER=`echo AC_power value=$power`
 ACVOLTAGE=`echo AC_voltage value=$voltage`
 ACCURRENT=`echo AC_current value=$current`
 ACFACTOR=`echo AC_factor value=$factor`
+ACENERGY=`echo AC_energytoday value=$energytoday
 TEMPBUERO=`echo temperature_buero value=$tempbuero`
 TEMPBETT=`echo temperature_bett value=$tempbett`
 TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
@@ -66,9 +69,10 @@ SOLARPOWER=`echo SOLAR_power value=$power_solar`
 SOLARVOLTAGE=`echo SOLAR_voltage value=$voltage_solar`
 SOLARCURRENT=`echo SOLAR_current value=$current_solar`
 SOLARFACTOR=`echo SOLAR_factor value=$factor_solar`
+SOLARENERGY=`echo SOLAR_ENERGY_TODAY_kWh value=$energy_solar`
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $TEMPBUERO $TEMPBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
+MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $TEMPBUERO $TEMPBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
 #
 
 # echo $MESSWERTE
