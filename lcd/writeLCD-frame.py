@@ -5,6 +5,8 @@
 # Import LCD library
 from RPLCD import i2c
 
+import os
+
 # Import sleep library
 from time import sleep,gmtime,strftime
 #import datetime
@@ -37,19 +39,35 @@ lcd = i2c.CharLCD(i2c_expander, address, port=port, charmap=charmap,
 # # Clear the LCD screen
 # lcd.close(clear=True)
 
+sleep(5) # wait 5s after machine startup
+
 while True:
     # get data
     timedate = strftime("%Y-%m-%d %H:%M")
     #print(timedate)
     
     # Raumtemperatur Buero
-    ftempbuero = open('/var/log/am2302_temperature','r')                                                                     
-    tempbuero = str(round(float(ftempbuero.read()),1))
-    ftempbuero.close()                                                                                                
+
+    if os.path.getsize('/var/log/am2302_temperature') == 1:
+        tempbuero="NA"
+    else:
+        file1 = open('/var/log/am2302_temperature','r')
+        tempbuero=str(round(float(file1.read()),1))
+        file1.close()                                                                                                
+
+    #ftempbuero = open('/var/log/am2302_temperature','r')                                                                     
+    #tempbuero = str(round(float(ftempbuero.read()),1))
+
     # Luftfeuchte Buero
-    ffeuchtebuero = open('/var/log/am2302_humidity','r')                                                                     
-    feuchtebuero = str(round(float(ffeuchtebuero.read()),1))
-    ffeuchtebuero.close()                                                                                                
+    if os.path.getsize('/var/log/am2302_humidity') == 1:
+        tempbuero="NA"
+    else:
+        file1 = open('/var/log/am2302_humidity','r')
+        feuchtebuero=str(round(float(file1.read()),1))
+        file1.close()                                                                                                
+    #ffeuchtebuero = open('/var/log/am2302_humidity','r')                                                                     
+    #feuchtebuero = str(round(float(ffeuchtebuero.read()),1))
+    #ffeuchtebuero.close()                                                                                                
      
     # Netzbezug Strom
     # fenergienetz = open('/var/tmp/netzbezug_Wh','r')                                                                    
