@@ -16,6 +16,12 @@ MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 
 # Daten von powermeter-A/C im Estrich holen
 energytoday=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
+# Tagesverbrauch kann auch N/A sein, dann auf 0 setzen
+if [ -z "$energytoday" ] 
+then 
+	energytoday=0 
+fi
+
 factor=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
 voltage=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
@@ -30,12 +36,17 @@ tempbuero=`curl -s -X GET http://192.168.0.75/cm?cmnd=Status%208 | jq -r '.Statu
 tempbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.DS18B20.Temperature'`
 
 # tasmota Estrich
-tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.Temperature'`
-humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.Humidity'`
-dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.DewPoint'`
+# tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.Temperature'`
+# humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.Humidity'`
+# dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.AM2301.DewPoint'`
 
 # Daten von sonoff powermeter am Solarpanel holen
 energy_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
+# Tageserzeugung kann auch N/A sein, dann auf 0 setzen
+if [ -z "$energy_solar" ]
+then 
+	energy_solar=0 
+fi
 factor_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
 voltage_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
@@ -43,39 +54,41 @@ current_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.S
 # I love bc :-) Leistung Solar berechnen
 power_solar=`echo "$factor_solar*$voltage_solar*$current_solar" | bc`
 
-#dt=$(date '+%Y-%m-%d %H:%M:%S')
-#echo $dt $power $factor $voltage $current
-
-#MESSWERTEAUSSEN=`./get_sensor_bmp085.py`
-#MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 
 ##############################
 # Daten formatieren
 ##############################
 
 # umformatieren, Beschreibung der Zahlenwerte dazu
-
 ACPOWER=`echo AC_power value=$power`
 ACVOLTAGE=`echo AC_voltage value=$voltage`
 ACCURRENT=`echo AC_current value=$current`
 ACFACTOR=`echo AC_factor value=$factor`
-ACENERGY=`echo AC_energytoday value=$energytoday
+ACENERGY=`echo AC_energytoday value=$energytoday`
+#echo $ACENERGY
+#echo "test"
+
 TEMPBUERO=`echo temperature_buero value=$tempbuero`
 TEMPBETT=`echo temperature_bett value=$tempbett`
-TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
-HUMESTRICH=`echo humidity_estrich value=$humestrich`
-DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
+
+# TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
+# HUMESTRICH=`echo humidity_estrich value=$humestrich`
+# DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
 SOLARPOWER=`echo SOLAR_power value=$power_solar`
-SOLARVOLTAGE=`echo SOLAR_voltage value=$voltage_solar`
-SOLARCURRENT=`echo SOLAR_current value=$current_solar`
-SOLARFACTOR=`echo SOLAR_factor value=$factor_solar`
+# SOLARVOLTAGE=`echo SOLAR_voltage value=$voltage_solar`
+# SOLARCURRENT=`echo SOLAR_current value=$current_solar`
+# SOLARFACTOR=`echo SOLAR_factor value=$factor_solar`
 SOLARENERGY=`echo SOLAR_ENERGY_TODAY_kWh value=$energy_solar`
 
+#echo $SOLARENERGY
+
 # alle Messwerte hintereinander
-MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $TEMPBUERO $TEMPBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
+MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $SOLARENERGY $TEMPBUERO $TEMPBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
+#MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $SOLARENERGY $TEMPBUERO $TEMPBETT`
+#MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $TEMPBUERO $TEMPBETT`
 #
 
-# echo $MESSWERTE
+#echo $MESSWERTE
 
 
 # Messwertzeilen durch \n getrennt
