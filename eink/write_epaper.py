@@ -132,7 +132,7 @@ while (True):
     file1.close()                                                                                                
     # Solar-Leistung aktuell (aus influx)
     file1 = open('/var/log/solar_W','r')                                                                     
-    solar_W = str(int(file1.read()))
+    solar_W = str(round(float(file1.read()),0))
     file1.close()                                                                                                
     # Solar-Erzeugung heute (aus influx)
     file1 = open('/var/log/solar_kWh','r')                                                                     

@@ -14,7 +14,7 @@ from time import sleep,gmtime,strftime
 
 # constants to initialise the LCD
 lcdmode = 'i2c'
-cols = 20
+cols = 16
 rows = 4
 charmap = 'A02'
 i2c_expander = 'PCF8574'
@@ -38,13 +38,31 @@ lcd = i2c.CharLCD(i2c_expander, address, port=port, charmap=charmap,
 # lcd.backlight_enabled = True
 # # Clear the LCD screen
 # lcd.close(clear=True)
+#ip = str(os.system("ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'"))
+#print(ip)
+lcd.write_string('machine start...')
+lcd.crlf()
+lcd.write_string('----------------')
+#lcd.crlf()
 
 sleep(5) # wait 5s after machine startup
+lcd.close(clear=True)
 
 while True:
     # get data
     timedate = strftime("%Y-%m-%d %H:%M")
     #print(timedate)
+
+    # occupancy
+
+    if os.path.getsize('/var/log/occupancystring') <= 1:
+        occupancystring="NA"
+    else:
+        file1 = open('/var/log/occupancystring','r')
+        occupancystring=str(file1.read()).strip()
+        file1.close()                                                                                                
+
+    #occupancystring = occupancystring.strip()
     
     # Raumtemperatur Buero
 
@@ -58,9 +76,9 @@ while True:
     #ftempbuero = open('/var/log/am2302_temperature','r')                                                                     
     #tempbuero = str(round(float(ftempbuero.read()),1))
 
-    # Luftfeuchte Buero
+    # Luftdruck
     if os.path.getsize('/var/log/bmp180_airpressure') == 1:
-        tempbuero="NA"
+        airpressure="NA"
     else:
         file1 = open('/var/log/bmp180_airpressure','r')
         airpressure=str(round(float(file1.read()),1))
@@ -91,7 +109,8 @@ while True:
     # line3 = "Wasser: " + wasserbezug + " Liter"
     #line4 = "HWR: " + tempHWR + chr(223) + "C " + feuchteHWR + "%"
     line1 = tempbuero + chr(223) + "C " + airpressure + "bar"
-    line2 = timedate
+    line2 = occupancystring
+    #line2 = "testtteehosan,.t"
     
     #print(line1)
     #lcd.write_string(energienetz "Wh ")
@@ -99,10 +118,6 @@ while True:
     lcd.crlf()
     lcd.write_string(line2)
     lcd.crlf()
-    #lcd.write_string(line3)
-    #lcd.crlf()
-    #lcd.write_string(line4)
-    #lcd.crlf()
     #sleep(2)
     # Switch off backlight
     #lcd.backlight_enabled = True
