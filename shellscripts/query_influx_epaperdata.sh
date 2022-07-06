@@ -50,7 +50,7 @@ CSVDATA=`curl -s -k --request POST \
 	--header "Content-type: application/vnd.flux" \
 	--data '
 	from(bucket: "od10_messwerte")
-	   	|> range(start:-1h)
+	   	|> range(start:-1d)
 		|> filter(fn: (r) => r["_measurement"] == "AC_energytoday")
 		|> filter(fn: (r) => r["_field"] == "value")
 		|> tail(n:1)
@@ -119,3 +119,21 @@ TEMP1=`echo "$CSVDATA" | awk /_result/ | awk -F "," '{ print $9;exit; }'`
 #echo "$TEMP1" | xargs printf "%.2f \n"
 TEMPROUNDED=`awk -v temp="$TEMP1" 'BEGIN { rounded = sprintf("%.1f", temp); print rounded }'`
 echo $TEMPROUNDED > /var/log/aussentemperatur
+
+
+# occupancy (Bewegungsmelder) holen
+CSVDATA=`curl -s -k --request POST \
+ "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/query?org=influx@georgruss.ch"\
+  --header "Authorization: Token $INFLUX_TOKEN"\
+	--header "Accept: application/csv" \
+	--header "Content-type: application/vnd.flux" \
+	--data '
+	from(bucket: "od10_messwerte")
+	   	|> range(start:-1d)
+		|> filter(fn: (r) => r["_measurement"] == "occupancy")
+		|> filter(fn: (r) => r["_field"] == "global_value")
+		|> tail(n:1)
+		'
+		`
+occupancystring=`echo "$CSVDATA" | awk /_result/ | awk -F "," '{ print $7;exit; }'` 
+echo $occupancystring > /var/log/occupancystring
