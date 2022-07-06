@@ -48,10 +48,10 @@ while True:
     
     # Raumtemperatur Buero
 
-    if os.path.getsize('/var/log/am2302_temperature') == 1:
+    if os.path.getsize('/var/log/bmp180_temperature') == 1:
         tempbuero="NA"
     else:
-        file1 = open('/var/log/am2302_temperature','r')
+        file1 = open('/var/log/bmp180_temperature','r')
         tempbuero=str(round(float(file1.read()),1))
         file1.close()                                                                                                
 
@@ -59,11 +59,11 @@ while True:
     #tempbuero = str(round(float(ftempbuero.read()),1))
 
     # Luftfeuchte Buero
-    if os.path.getsize('/var/log/am2302_humidity') == 1:
+    if os.path.getsize('/var/log/bmp180_airpressure') == 1:
         tempbuero="NA"
     else:
-        file1 = open('/var/log/am2302_humidity','r')
-        feuchtebuero=str(round(float(file1.read()),1))
+        file1 = open('/var/log/bmp180_airpressure','r')
+        airpressure=str(round(float(file1.read()),1))
         file1.close()                                                                                                
     #ffeuchtebuero = open('/var/log/am2302_humidity','r')                                                                     
     #feuchtebuero = str(round(float(ffeuchtebuero.read()),1))
@@ -90,7 +90,7 @@ while True:
     # line2 = "P_solar: " + str(solarleistung) + " W"
     # line3 = "Wasser: " + wasserbezug + " Liter"
     #line4 = "HWR: " + tempHWR + chr(223) + "C " + feuchteHWR + "%"
-    line1 = tempbuero + chr(223) + "C " + feuchtebuero + "%"
+    line1 = tempbuero + chr(223) + "C " + airpressure + "bar"
     line2 = timedate
     
     #print(line1)

@@ -92,32 +92,32 @@ while (True):
     # get data
     timedate = time.strftime("%d.%m.%Y %H:%M:%S")
 
-    # Raumtemperatur Buero
+    # Raumtemperatur Buero (lokaler Sensor)
 
-    if os.path.getsize('/var/log/am2302_temperature') == 1:
+    if os.path.getsize('/var/log/bmp180_temperature') == 1:
         tempbuero="NA"
     else:
-        file1 = open('/var/log/am2302_temperature','r')
+        file1 = open('/var/log/bmp180_temperature','r')
         tempbuero=str(round(float(file1.read()),1))
         file1.close()                                                                                                
 
     #ftempbuero = open('/var/log/am2302_temperature','r')                                                                     
     #tempbuero = str(round(float(ftempbuero.read()),1))
 
-    # Luftfeuchte Buero
-    if os.path.getsize('/var/log/am2302_humidity') == 1:
-        tempbuero="NA"
+    # Luftdruck (lokaler Sensor)
+    if os.path.getsize('/var/log/bmp180_airpressure') == 1:
+        airpressure="NA"
     else:
-        file1 = open('/var/log/am2302_humidity','r')
-        feuchtebuero=str(round(float(file1.read()),1))
+        file1 = open('/var/log/bmp180_airpressure','r')
+        airpressure=str(round(float(file1.read()),1))
         file1.close()                                                                                                
         
-    # Aussentemperatur
+    # Aussentemperatur (kommt aus influx-query)
     file1 = open('/var/log/aussentemperatur','r')                                                                     
     aussentemperatur = str(round(float(file1.read()),1))
     file1.close()                                                                                                
     
-    # Verbrauch A/C
+    # Verbrauch A/C (aus influx-query)
     
     if os.path.getsize('/var/log/AC_kWh') == 1:
         AC_kWh="NA"
@@ -126,15 +126,15 @@ while (True):
         AC_kWh=str(round(float(file1.read()),2))
         file1.close()                                                                                                
 
-    # Netzbezug Wh
+    # Netzbezug Wh (aus influx)
     file1 = open('/var/log/netzbezug_Wh','r')                                                                     
     netzbezug_Wh = str(round(float(file1.read())/1000,2))
     file1.close()                                                                                                
-    # Solar-Leistung aktuell
+    # Solar-Leistung aktuell (aus influx)
     file1 = open('/var/log/solar_W','r')                                                                     
     solar_W = str(int(file1.read()))
     file1.close()                                                                                                
-    # Solar-Erzeugung heute
+    # Solar-Erzeugung heute (aus influx)
     file1 = open('/var/log/solar_kWh','r')                                                                     
     solar_kWh = str(float(file1.read()))
     file1.close()                                                                                                
@@ -147,7 +147,7 @@ while (True):
     time_draw.text((0, 22), "aktuell", font = font14, fill = 0)
     time_draw.line((0, 37, 152, 37), fill = 0)
     time_draw.text((0, 40), tempbuero+"°C Büro", font = font18, fill = 0)
-    time_draw.text((0, 60), feuchtebuero+"% Büro", font = font18, fill = 0)
+    time_draw.text((0, 60), airpressure+"bar", font = font18, fill = 0)
     time_draw.text((0, 80), aussentemperatur+"°C aussen", font = font18, fill = 0)
     time_draw.text((0, 100), solar_W+" W Solar", font = font18, fill = 0)
     time_draw.line((0, 125, 152, 125), fill = 0)
