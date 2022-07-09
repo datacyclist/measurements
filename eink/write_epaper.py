@@ -94,7 +94,7 @@ while (True):
 
     # Raumtemperatur Buero (lokaler Sensor)
 
-    if os.path.getsize('/var/log/bmp180_temperature') == 1:
+    if os.path.getsize('/var/log/bmp180_temperature') <= 1:
         tempbuero="NA"
     else:
         file1 = open('/var/log/bmp180_temperature','r')
@@ -109,7 +109,7 @@ while (True):
         airpressure="NA"
     else:
         file1 = open('/var/log/bmp180_airpressure','r')
-        airpressure=str(round(float(file1.read()),1))
+        airpressure=str(file1.read()).strip()
         file1.close()                                                                                                
         
     # Aussentemperatur (kommt aus influx-query)
@@ -127,13 +127,21 @@ while (True):
         file1.close()                                                                                                
 
     # Netzbezug Wh (aus influx)
-    file1 = open('/var/log/netzbezug_Wh','r')                                                                     
-    netzbezug_Wh = str(round(float(file1.read())/1000,2))
-    file1.close()                                                                                                
+    if os.path.getsize('/var/log/netzbezug_Wh') <= 1:
+        netzbezug_Wh="NA"
+    else:
+        file1 = open('/var/log/netzbezug_Wh','r')                                                                     
+        netzbezug_Wh = str(round(float(file1.read())/1000,2))
+        file1.close()                                                                                                
+
     # Solar-Leistung aktuell (aus influx)
-    file1 = open('/var/log/solar_W','r')                                                                     
-    solar_W = str(round(float(file1.read()),0))
-    file1.close()                                                                                                
+    if os.path.getsize('/var/log/solar_W') <= 1:
+        solar_W="NA"
+    else:
+        file1 = open('/var/log/solar_W','r')
+        solar_W = file1.read().strip()
+        file1.close()                                                                                                
+
     # Solar-Erzeugung heute (aus influx)
     file1 = open('/var/log/solar_kWh','r')                                                                     
     solar_kWh = str(float(file1.read()))

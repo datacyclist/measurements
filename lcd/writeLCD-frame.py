@@ -66,7 +66,7 @@ while True:
     
     # Raumtemperatur Buero
 
-    if os.path.getsize('/var/log/bmp180_temperature') == 1:
+    if os.path.getsize('/var/log/bmp180_temperature') <= 1:
         tempbuero="NA"
     else:
         file1 = open('/var/log/bmp180_temperature','r')
@@ -81,7 +81,7 @@ while True:
         airpressure="NA"
     else:
         file1 = open('/var/log/bmp180_airpressure','r')
-        airpressure=str(round(float(file1.read()),1))
+        airpressure=str(file1.read()).strip()
         file1.close()                                                                                                
     #ffeuchtebuero = open('/var/log/am2302_humidity','r')                                                                     
     #feuchtebuero = str(round(float(ffeuchtebuero.read()),1))
