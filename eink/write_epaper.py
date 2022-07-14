@@ -127,12 +127,18 @@ while (True):
         file1.close()                                                                                                
 
     # Netzbezug Wh (aus influx)
-    if os.path.getsize('/var/log/netzbezug_Wh') <= 1:
-        netzbezug_Wh="NA"
-    else:
-        file1 = open('/var/log/netzbezug_Wh','r')                                                                     
-        netzbezug_Wh = str(round(float(file1.read())/1000,2))
-        file1.close()                                                                                                
+    print("os.path.getsize('/var/log/netzbezug_Wh'")
+    print(os.path.getsize('/var/log/netzbezug_Wh'))
+    print("os.path.getsize('/var/log/solar_kWh'")
+    print(os.path.getsize('/var/log/solar_kWh'))
+
+    #if os.path.getsize('/var/log/netzbezug_Wh') <= 1:
+    #    netzbezug_Wh="NA"
+    #else:
+    file1 = open('/var/log/netzbezug_Wh','r')                                                                     
+    #   netzbezug_Wh = str(round(float(file1.read())/1000,2))
+    netzbezug_Wh = file1.read().strip()
+    file1.close()                                                                                                
 
     # Solar-Leistung aktuell (aus influx)
     if os.path.getsize('/var/log/solar_W') <= 1:
@@ -142,10 +148,21 @@ while (True):
         solar_W = file1.read().strip()
         file1.close()                                                                                                
 
+    # PC-Leistung aktuell (aus influx)
+    if os.path.getsize('/var/log/PC_W') <= 1:
+        PC_W="NA"
+    else:
+        file1 = open('/var/log/PC_W','r')
+        PC_W= file1.read().strip()
+        file1.close()                                                                                                
+
     # Solar-Erzeugung heute (aus influx)
-    file1 = open('/var/log/solar_kWh','r')                                                                     
-    solar_kWh = str(float(file1.read()))
-    file1.close()                                                                                                
+    if os.path.getsize('/var/log/solar_kWh') <= 1:
+        solar_kWh="NA"
+    else:
+        file1 = open('/var/log/solar_kWh','r')                                                                     
+        solar_kWh = str(float(file1.read()))
+        file1.close()                                                                                                
     
     # this triggers partial update for the whole specified area (=the whole display here)
     time_draw.rectangle((0, 0, 152, 296), fill = 255)
@@ -158,12 +175,13 @@ while (True):
     time_draw.text((0, 60), airpressure+"bar", font = font18, fill = 0)
     time_draw.text((0, 80), aussentemperatur+"°C aussen", font = font18, fill = 0)
     time_draw.text((0, 100), solar_W+" W Solar", font = font18, fill = 0)
-    time_draw.line((0, 125, 152, 125), fill = 0)
-    time_draw.text((0, 125), "Mengen heute", font=font14, fill = 0)
-    time_draw.line((0, 140, 152, 140), fill = 0)
-    time_draw.text((0, 145), AC_kWh+" kWh A/C", font = font18, fill = 0)
-    time_draw.text((0, 165), solar_kWh+" kWh Solar", font = font18, fill = 0)
-    time_draw.text((0, 185), netzbezug_Wh+" kWh Netz", font = font18, fill = 0)
+    time_draw.text((0, 120), PC_W+" W PC/Büro", font = font18, fill = 0)
+    time_draw.line((0, 145, 152, 145), fill = 0)
+    time_draw.text((0, 145), "Mengen heute", font=font14, fill = 0)
+    time_draw.line((0, 160, 152, 160), fill = 0)
+    time_draw.text((0, 165), AC_kWh+" kWh A/C", font = font18, fill = 0)
+    time_draw.text((0, 185), solar_kWh+" kWh Solar", font = font18, fill = 0)
+    time_draw.text((0, 205), netzbezug_Wh+" Wh Netz", font = font18, fill = 0)
     epd.display(epd.getbuffer(Limage))
         
         #num = num + 1
