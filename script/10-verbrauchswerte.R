@@ -341,7 +341,7 @@ verbrauchsplot1 <- ggplot(dfplot1) +
 			 )
 
 png(filename=paste(figdirprefix, filedateprefix, "_verbrauchsverlauf_jahrmonat.png", sep=''),
-		width=800, height=700)
+		width=1200, height=700)
  print(verbrauchsplot1)
 dev.off()
 
@@ -513,7 +513,7 @@ kostenplot2 <- ggplot(dfplot3) +
 			 )
 
 png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_jahrmonat.png", sep=''),
-		width=750, height=700)
+		width=1250, height=700)
  print(kostenplot2)
 dev.off()
 
@@ -530,7 +530,7 @@ kostenplot3 <- ggplot(dfplot3) +
 			 )
 
 png(filename=paste(figdirprefix, filedateprefix, "_kostenverlauf_jahrmonat_stack.png", sep=''),
-		width=850, height=700)
+		width=1250, height=700)
  print(kostenplot3)
 dev.off()
 
