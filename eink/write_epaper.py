@@ -123,7 +123,7 @@ while (True):
         AC_kWh="NA"
     else:
         file1 = open('/var/log/AC_kWh','r')
-        AC_kWh=str(round(float(file1.read()),2))
+        AC_kWh=str(file1.read()).strip()
         file1.close()                                                                                                
 
     # Netzbezug Wh (aus influx)
@@ -139,6 +139,15 @@ while (True):
     #   netzbezug_Wh = str(round(float(file1.read())/1000,2))
     netzbezug_Wh = file1.read().strip()
     file1.close()                                                                                                
+
+    
+    # occupancy
+    if os.path.getsize('/var/log/occupancystring') <= 1:
+        occupancystring="NA"
+    else:
+        file1 = open('/var/log/occupancystring','r')
+        occupancystring=str(file1.read()).strip()
+        file1.close()                                                                                                
 
     # Solar-Leistung aktuell (aus influx)
     if os.path.getsize('/var/log/solar_W') <= 1:
@@ -182,6 +191,7 @@ while (True):
     time_draw.text((0, 165), AC_kWh+" kWh A/C", font = font18, fill = 0)
     time_draw.text((0, 185), solar_kWh+" kWh Solar", font = font18, fill = 0)
     time_draw.text((0, 205), netzbezug_Wh+" Wh Netz", font = font18, fill = 0)
+    time_draw.text((0, 245), occupancystring, font = font14, fill = 0)
     epd.display(epd.getbuffer(Limage))
         
         #num = num + 1
