@@ -359,8 +359,10 @@ df2 <- df_days %>%
 	#fill(verbrauch_strom_nt_pro_tag_kWh, .direction='up') %>%
 	#fill(verbrauch_strom_ht_pro_tag_kWh, .direction='up') %>%
 	#fill(verbrauch_strom_gesamt_pro_tag, .direction='up') %>%
-	mutate(jahr = as.numeric(format(datum, format = "%Y"))) %>%
-	left_join(dfpreise, by="jahr") %>%
+	mutate(
+				 jahr = as.numeric(format(datum, format = "%Y")),
+				 monat = as.numeric(format(datum, format = "%m"))) %>%
+	left_join(dfpreise, by=c("jahr", "monat")) %>%
 	left_join(df_datum_tage_pro_monat_join, by='datum') %>% 
 	#mutate(abgelesen_flag = ifelse(is.na(timestamp_orig), FALSE, TRUE)) %>%
 	mutate(
