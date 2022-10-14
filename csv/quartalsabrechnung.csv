@@ -1,6 +1,7 @@
 # offizielle Zählerstände aus Quartalsabrechnung hier eintragen
 date	strom_tag	strom_nacht	gas	wasser
-2022-09-30	NA	NA	NA	NA
+2022-12-31	NA	NA	NA	NA
+2022-09-30	6052	11234	12129	438
 2022-06-30	5866	10943	12112	424
 2022-03-31	5723	10701	12055	414
 2021-12-31	5469	10404	11820	406
