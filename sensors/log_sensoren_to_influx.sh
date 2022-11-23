@@ -42,7 +42,7 @@ tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.Sta
 humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
 dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.DewPoint'`
 
-# Daten von sonoff powermeter am Solarpanel holen
+# Daten von sonoff powermeter am Solarpanel auf Kellerplatte holen
 energy_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
 # Tageserzeugung kann auch N/A sein, dann auf 0 setzen
 if [ -z "$energy_solar" ]
@@ -55,6 +55,20 @@ current_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.S
 
 # I love bc :-) Leistung Solar berechnen
 power_solar=`echo "$factor_solar*$voltage_solar*$current_solar" | bc`
+
+# Daten von sonoff powermeter am Solarpanel Fensterläden holen
+energy_solar_vertical=`curl -s -X GET http://192.168.0.80/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
+# Tageserzeugung kann auch N/A sein, dann auf 0 setzen
+if [ -z "$energy_solar_vertical" ]
+then 
+	energy_solar_vertical=0 
+fi
+factor_solar_vertical=`curl -s -X GET http://192.168.0.80/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Factor'`
+voltage_solar_vertical=`curl -s -X GET http://192.168.0.80/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
+current_solar_vertical=`curl -s -X GET http://192.168.0.80/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
+
+# Leistung Solar berechnen
+power_solar_vertical=`echo "$factor_solar_vertical*$voltage_solar_vertical*$current_solar_vertical" | bc`
 
 
 ##############################
@@ -80,16 +94,19 @@ TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
 HUMESTRICH=`echo humidity_estrich value=$humestrich`
 DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
 
+SOLARENERGY=`echo SOLAR_ENERGY_TODAY_kWh value=$energy_solar`
 SOLARPOWER=`echo SOLAR_power value=$power_solar`
 # SOLARVOLTAGE=`echo SOLAR_voltage value=$voltage_solar`
 # SOLARCURRENT=`echo SOLAR_current value=$current_solar`
 # SOLARFACTOR=`echo SOLAR_factor value=$factor_solar`
-SOLARENERGY=`echo SOLAR_ENERGY_TODAY_kWh value=$energy_solar`
+
+SOLARENERGY_VERTICAL=`echo SOLAR_ENERGY_vertical_TODAY_kWh value=$energy_solar_vertical`
+SOLARPOWER_VERTICAL=`echo SOLAR_power_vertical value=$power_solar_vertical`
 
 #echo $SOLARENERGY
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $SOLARENERGY $TEMPBUERO $HUMBUERO $TEMPBETT $HUMBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
+MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBUERO $HUMBUERO $TEMPBETT $HUMBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
 #MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $SOLARENERGY $TEMPBUERO $TEMPBETT`
 #MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $TEMPBUERO $TEMPBETT`
 #
