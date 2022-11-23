@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# script läuft auf host raspberryiot
+# script läuft auf host cucina
 
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
@@ -11,9 +11,12 @@ TIMESTAMP=`date +"%s"`
 FILEDATE=`date +"%Y%m%d"`
 
 # Daten von Heizung abholen, alles auf einmal :-)
-MESSWERTE=`/usr/bin/vclient -h 127.0.0.1:3002 -m -c 'getTempWWist,getTempWWsoll,getTempKist,getTempAged,getTempA,\
-getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
-getPumpeStatusM1,getPumpeDrehzahlIntern,getBetriebArt,getTempVListM1,getTempVLsollM1,getTempRL17A,getTempAbgas '`
+MESSWERTE=`/usr/bin/vclient -h 127.0.0.1:3002 -m -c 'getTempWWist,getTempWWsoll,\
+getTempKist,getTempAged,getTempA,\
+getTempSpu,getTempVListM1,getTempVLsollM1,\
+getBetriebArt,getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,
+getPumpeStatusM1,getPumpeDrehzahlIntern,getPumpeStatusSp,getPumpeStatusZirku,getPumpeStatusIntern,\
+getTempRL17A,getTempAbgas '`
 
 #echo $MESSWERTE
 
@@ -27,10 +30,12 @@ getPumpeStatusM1,getPumpeDrehzahlIntern,getBetriebArt,getTempVListM1,getTempVLso
 
 # Messwertzeilen durch \n getrennt
 
+# echo "reformatting\n"
 MESS=`echo $MESSWERTE | sed 's/ get/\nget/g;s/.value\ / value=/g' `
 
 # such a mess...
 
+# echo "posting to influx\n"
 ##############################
 # Daten in influxdb POSTen
 ##############################
@@ -42,7 +47,7 @@ curl -k -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write
 # (curl ohne Zertifikatprüfung: -k)
 
 ##############################
-# Daten in File ablegen zwecks späterer Auswertung in R
+# echo "Daten in File ablegen zwecks späterer Auswertung in R\n"
 ##############################
 LOGLINE=$TIMESTAMP" "$MESSWERTE
 
