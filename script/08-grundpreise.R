@@ -16,8 +16,8 @@ preise2023 <- tibble(
 											preis_menge_strom_nt = (12.92+6.89)/(1+mwst2), #Rp.
 											preis_menge_strom_sdl_kev_abgaben = (0.50+3.75)/(1+mwst2), #Rp.
 
-											# Gas wird nochmal angepasst seitens TB Wil (Preise Q4/2022)
-											preis_menge_gas = (5.17+1.21+0.43+2.34)/(1+mwst2), #Rp., Bruttopreise hier eintragen
+											# Gaspreis: 12.60 Rp./kWh
+											preis_menge_gas = (8.72+1.21+0.32+2.35)/(1+mwst2), #Rp., Bruttopreise hier eintragen
 
 											preis_menge_wasser = 1.28/(1+mwst1), #Fr. pro Kubikmeter,
 											preis_menge_abwasser = 1.44/(1+mwst2), #Fr. pro Kubikmeter,
@@ -42,7 +42,7 @@ preise2022_q4 <- tibble(
 											preis_menge_strom_ht = (8.72+10.12)/(1+mwst2), #Rp. brutto get. durch Mwst.
 											preis_menge_strom_nt = (7.65+6.25)/(1+mwst2), #Rp.
 											preis_menge_strom_sdl_kev_abgaben = (0.17+3.75)/(1+mwst2), #Rp.
-
+											# Gaspreis: 9.15 Rp./kWh
 											preis_menge_gas = (5.17+1.21+0.43+2.34)/(1+mwst2), #Rp., Bruttopreise hier eintragen
 											preis_menge_wasser = 1.28/(1+mwst1), #Fr. pro Kubikmeter,
 											preis_menge_abwasser = 1.44/(1+mwst2), #Fr. pro Kubikmeter,
@@ -66,6 +66,7 @@ preise2022_q1_q2_q3 <- tibble(
 											preis_menge_strom_nt = (7.65+6.25)/(1+mwst2), #Rp.
 											preis_menge_strom_sdl_kev_abgaben = (0.17+3.75)/(1+mwst2), #Rp.
 											# Strom HT 22.76 Rp./kWh, Strom NT 18.82 Rp./kWh
+											# Gaspreis: 7.169 Rp./kWh
 											preis_menge_gas = (3.70+0.90+0.40+2.169)/(1+mwst2), #Rp., Bruttopreis get. durch Mwst.
 											preis_menge_wasser = 1.28/(1+mwst1), #Fr. pro Kubikmeter,
 											preis_menge_abwasser = 1.44/(1+mwst2), #Fr. pro Kubikmeter,
