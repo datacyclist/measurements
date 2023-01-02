@@ -12,11 +12,11 @@ FILEDATE=`date +"%Y%m%d"`
 
 # Daten von Heizung abholen, alles auf einmal :-)
 MESSWERTE=`/usr/bin/vclient -h 127.0.0.1:3002 -m -c 'getTempWWist,getTempWWsoll,\
-getTempKist,getTempAged,getTempA,\
+getTempKist,getTempAged,getTempA,getTempAbgas,\
 getTempSpu,getTempVListM1,getTempVLsollM1,\
-getBetriebArt,getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,
-getPumpeStatusM1,getPumpeDrehzahlIntern,getPumpeStatusSp,getPumpeStatusZirku,getPumpeStatusIntern,\
-getTempRL17A,getTempAbgas,getLeistungIst,getUmschaltventil,getTempRaumNorSollM1 '`
+getBetriebArt,getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
+getPumpeStatusM1,getPumpeDrehzahlIntern,getPumpeStatusIntern,\
+getTempRaumNorSollM1,getUmschaltventil'`
 
 #echo $MESSWERTE
 
@@ -33,6 +33,7 @@ getTempRL17A,getTempAbgas,getLeistungIst,getUmschaltventil,getTempRaumNorSollM1 
 # echo "reformatting\n"
 MESS=`echo $MESSWERTE | sed 's/ get/\nget/g;s/.value\ / value=/g' `
 
+#echo $MESS
 # such a mess...
 
 # echo "posting to influx\n"
