@@ -24,4 +24,10 @@ if [ "$1" == "BA" ]; then
  	/usr/bin/vclient -c "setBetriebArtM1 $2"
 fi
 
+# Heizung per Raumtemperatur runterregeln:
+
+if [ "$1" == "RT" ]; then
+	/usr/bin/vclient -c "setTempRaumNorSollM1 $2"
+fi
+
 # Weitere Shortcuts bei Bedarf
