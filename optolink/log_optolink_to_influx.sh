@@ -16,7 +16,7 @@ getTempKist,getTempAged,getTempA,\
 getTempSpu,getTempVListM1,getTempVLsollM1,\
 getBetriebArt,getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,
 getPumpeStatusM1,getPumpeDrehzahlIntern,getPumpeStatusSp,getPumpeStatusZirku,getPumpeStatusIntern,\
-getTempRL17A,getTempAbgas '`
+getTempRL17A,getTempAbgas,getLeistungIst,getUmschaltventil,getTempRaumNorSollM1 '`
 
 #echo $MESSWERTE
 
