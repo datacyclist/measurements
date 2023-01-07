@@ -1,0 +1,98 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[10pt,a4paper]{article}
+%\usepackage[german]{babel}
+\usepackage{mathpazo}
+\renewcommand{\sfdefault}{lmss}
+\renewcommand{\ttdefault}{lmtt}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.0cm,bmargin=2.0cm,lmargin=2.0cm,rmargin=2.0cm}
+\usepackage{url}
+
+\author{Georg Russ}
+\date{\today}
+\title{Auswertung Tasmota-Log}
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<auswertung, echo=FALSE, warning=TRUE, message=FALSE>>=
+#library(zoo)
+library(ggplot2)
+library(gridExtra)
+library(xtable)
+library(readr)
+library(lubridate)
+library(dplyr)
+source("theme-kosten.R")
+
+# der Filename des Logfiles kommt per Variable im Makefile-Aufruf
+
+print(logfile)
+
+df <- read_delim(logfile, delim=' ')
+
+#df <- read_delim('powerlog.csv', delim=' ')
+names(df) <- c('date', 'time', 'power', 'factor', 'voltage', 'current')
+
+df_ext <- df %>%
+	mutate(
+				 datetime = as.POSIXct(x=paste(df$date, df$time, sep=' '), 
+																format=('%Y-%m-%d %H:%M:%S')),
+				 timelag = lag(datetime),
+				 timediff = as.numeric(difftime(datetime,timelag), unit='secs'),
+				 energy_ws = power * timediff
+) %>%
+filter(power < 2000)
+
+ges_energie_wh = round(sum(df_ext$energy_ws, na.rm=TRUE)/3600, digits=1)
+minlogtime <- min(df_ext$datetime, na.rm=TRUE)
+maxlogtime <-  max(df_ext$datetime, na.rm=TRUE)
+
+print(paste("Beginn Log:", minlogtime, sep = ' '))
+print(paste("Ende Log:  ", maxlogtime, sep = ' '))
+print(paste('Dauer Log: ', round(as.numeric(difftime(maxlogtime, minlogtime, units='mins')), digits=0), 'Minuten', sep=' '))
+print(paste("Energieverbrauch in Wh:", ges_energie_wh, sep=" "))
+
+
+#windowsize <- 60
+#dfkosten$Schnitt <- c(rep(NA,windowsize-1),
+#					rollapply(dfkosten$Kosten, width=windowsize, mean)
+#					)
+#dfkosten$Monat <- as.factor(as.numeric(format(dfkosten$Datum, format = "%Y%m")))
+
+######
+
+zeitplot <- ggplot(df_ext) +
+	#geom_point(aes(colour=Betreff), size=3) +
+#	geom_smooth(aes(y=Schnitt), colour="orange", size=2) +
+	geom_line(aes(x=datetime,y=power), colour = 'orange') +
+	#scale_y_continuous(limits=c(0,300)) +
+	theme_kosten() +
+	labs(title="Verbraucherleistung vs. Zeit", x='datetime', y='Leistung [W]')
+
+png(filename="verbraucherleistung_vs_zeit.png",
+		width=1200, height=600)
+ print(zeitplot)
+dev.off()
+
+
+@
+%%%% Ausgabe in Grafiken im Report %%%%
+
+\begin{figure}[h]
+
+<<zeitplot, echo=FALSE, results='asis', fig.width=11, fig.height=7, out.width='0.85\\linewidth'>>=
+	print(zeitplot)
+
+@
+	\label{fig:zeitplot}
+	\caption{Verbraucherleistung vs. Zeit}
+\end{figure}
+
+%\clearpage
+
+\end{document}
