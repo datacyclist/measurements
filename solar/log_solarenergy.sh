@@ -19,8 +19,8 @@ echo $dt $solarenergy_panel0_today >> /var/tmp/solar_panel0.log
 echo $dt $solarenergy_panel12_today >> /var/tmp/solar_panel12.log
 #!/bin/bash
 
-SOLARENERGYTODAY_PANEL0=`echo SOLAR_ENERGY_TODAY_kWh value=$solarenergy_panel0_today`
-SOLARENERGYTODAY_PANEL12=`echo SOLAR_ENERGY_TODAY_kWh value=$solarenergy_panel12_today`
+SOLARENERGYTODAY_PANEL0=`echo SOLAR_ENERGY_TODAY_kWh_panel0 value=$solarenergy_panel0_today`
+SOLARENERGYTODAY_PANEL12=`echo SOLAR_ENERGY_TODAY_kWh_panel12 value=$solarenergy_panel12_today`
 
 ## alle Messwerte hintereinander
 MESSWERTE=`echo $SOLARENERGYTODAY_PANEL0 $SOLARENERGYTODAY_PANEL12`
