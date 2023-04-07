@@ -4,7 +4,6 @@
 
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
-API_KEY_TS=`cat thingspeak_apikey`
 #echo $API_KEY_TS
 
 TIMESTAMP=`date +"%s"`
@@ -63,19 +62,21 @@ echo $LOGLINE >> /var/tmp/$FILEDATE-optolinklog.csv
 # einzelne Messwerte nach thingspeak loggen
 ##############################
 
-TEMPERATUR_NORDSEITE=`echo $MESSWERTE | sed 's/.*getTempA.value\s\(-*[0-9]*[0-9].[0-9]\).*getVol.*/\1/'`
+
+# TEMPERATUR_NORDSEITE=`echo $MESSWERTE | sed 's/.*getTempA.value\s\(-*[0-9]*[0-9].[0-9]\).*getVol.*/\1/'`
 #echo $TEMPERATUR_NORDSEITE
 
-TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\([0-9]*[0-9].[0-9]\).*getTempWWsoll.*/\1/'`
+# TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\([0-9]*[0-9].[0-9]\).*getTempWWsoll.*/\1/'`
 #echo $TEMPERATUR_NORDSEITE
 
 #TEMPERATUR_HWR=`cat /var/tmp/bmp280_temperature`
 
-curl -k -X GET -G https://api.thingspeak.com/update \
-	-d "api_key=$API_KEY_TS" \
-	-d "field1=$TEMPERATUR_NORDSEITE" \
-	-d "field2=$TEMPERATUR_WARMWASSER" \
-    	--header "Content-type: application/x-www-form-urlencoded" \
- 	--header "Accept: text/plain"
+#API_KEY_TS=`cat thingspeak_apikey`
+#curl -k -X GET -G https://api.thingspeak.com/update \
+#	-d "api_key=$API_KEY_TS" \
+#	-d "field1=$TEMPERATUR_NORDSEITE" \
+#	-d "field2=$TEMPERATUR_WARMWASSER" \
+#    	--header "Content-type: application/x-www-form-urlencoded" \
+# 	--header "Accept: text/plain"
 
 #	-d "field3=$TEMPERATUR_HWR" \
