@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TIMESTAMP=`date +"%s"`
+FILEDATE=`date +"%Y%m%d"`
+
+curl http://192.168.0.60/emeter/0/em_data.csv > /var/tmp/$FILEDATE-shellyem3-strom-L0-dump.csv
+curl http://192.168.0.60/emeter/1/em_data.csv > /var/tmp/$FILEDATE-shellyem3-strom-L1-dump.csv
+curl http://192.168.0.60/emeter/2/em_data.csv > /var/tmp/$FILEDATE-shellyem3-strom-L2-dump.csv
+
