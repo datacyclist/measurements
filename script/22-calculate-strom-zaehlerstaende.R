@@ -1,9 +1,15 @@
 ##############################
 # Stromzaehlerdaten aufbereiten
 #
-# liegen in CSV-Files, eins pro Tag, pro Zeile ein Timestamp und pro Zeile eine Wh
+# kommen von Data-Dump des Shelly 3EM
 #
-# 20210730, Georg Russ
+# liegen in CSV-Files, eins pro Monat und Phase (L0/L1/L2), pro Zeile ein
+# Timestamp minutengenau und dahinter die Werte fuer Wh_Netzbezug und
+# Wh_eingespeist
+#
+# ueberlappende Tageswerte werden per JOIN eliminiert
+#
+# 20230430, Georg Russ
 ##############################
 
 library(tidyverse)
@@ -33,8 +39,13 @@ cachedirprefix <- '../cache/'
 #								col_names=FALSE)
 
 ## Daten vom NAS holen, alle CSVs in einem bestimmten Verzeichnis
-dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*stromzaehler-ping.csv", full.names=TRUE) %>%
-			map_df(~read_csv(.,col_names=FALSE))
+dat_L0 <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*strom-L0-dump.csv", full.names=TRUE) %>%
+			map_df(~read_csv(.,col_names=TRUE))
+dat_L1 <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*strom-L1-dump.csv", full.names=TRUE) %>%
+			map_df(~read_csv(.,col_names=TRUE))
+dat_L2 <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*strom-L2-dump.csv", full.names=TRUE) %>%
+			map_df(~read_csv(.,col_names=TRUE))
+
 
 # Abgenommene Strommenge in HT und NT aufteilen
 #
@@ -45,11 +56,20 @@ dat <- list.files(path="/home/russ/mnt/nas/zaehlerlog/", pattern="*stromzaehler-
 # Zählerstände werden per Offset (aus abgelesenen Werten an bestimmtem Datum)
 # und cumsum errechnet
 
-df_kWh_ht_nt <- dat %>%
+# TODO: die CSVs haben vermutlich doppelte Einträge, da mehrere
+# Monats-Datenabzüge gleichzeitig eingelesen werden. Muss z.B. noch mit
+# unique() abgefangen werden, wenn mehrere Datenlieferungen da sind.
+
+#####
+# L0
+#####
+
+df_kWh_ht_nt_L0 <- dat_L0 %>%
 				mutate(
-				 timestamp_utc = X1,
+				 timestamp_utc = `Date/time UTC`,
 				 timestamp = as.POSIXct(format(timestamp_utc, tz='Europe/Zurich')),
-				 Wh = X2,
+				 Wh = `Active energy Wh (A)`,
+				 Wh_returned = `Returned energy Wh (A)`,
 				 wochentag = wday(timestamp),
 				 stunde = hour(timestamp),
 				 ht_nt = ifelse(
@@ -58,26 +78,109 @@ df_kWh_ht_nt <- dat %>%
 												"NT"),
 				 datum = as.Date(timestamp, "%Y%m%d", tz='Europe/Zurich')
 				) %>%
-	filter(timestamp>=format(as.Date("20210301", "%Y%m%d"))) %>%
+	unique() %>% # da mehrere Datenlieferungen gleichzeitig im df landen
+	filter(timestamp>=format(as.Date("20230301", "%Y%m%d"))) %>%
 	group_by(datum,ht_nt) %>%
 	summarise(datum = unique(datum),
-						Wh = sum(Wh)
+						Wh_L0 = sum(Wh),
+						Wh_returned_L0 = sum(Wh_returned)
 						) %>%
-	ungroup() %>%
-	pivot_wider(names_from=ht_nt, values_from = Wh) %>%
-	replace_na(list(HT=0)) %>%
-	arrange(datum) %>%
-	mutate(
-				 korrektur_q2_2021 = ifelse((datum>=format(as.Date("20210630", "%Y%m%d"))), 1, 0),
-				 HT_stand_cum = round(cumsum(HT)/1000 + 4666 + korrektur_q2_2021*2.5, digits=3),
-				 NT_stand_cum = round(cumsum(NT)/1000 + 9269 + korrektur_q2_2021*0.5, digits=3),
-				 datumprint = format(datum + days(1) - seconds(1), "%Y-%m-%dT%H:%M:%SZ")
-				 ) %>%
-	select(datumprint, HT_stand_cum, NT_stand_cum) %>%
-	arrange(desc(datumprint)) %>%
-  write_tsv(file=paste(cachedirprefix, filedateprefix, "-zaehlerstande-strom_errechnet.csv", sep=""))
+	ungroup()
 
+#####
+# L1
+#####
 
+df_kWh_ht_nt_L1 <- dat_L1 %>%
+				mutate(
+				 timestamp_utc = `Date/time UTC`,
+				 timestamp = as.POSIXct(format(timestamp_utc, tz='Europe/Zurich')),
+				 Wh = `Active energy Wh (B)`,
+				 Wh_returned = `Returned energy Wh (B)`,
+				 wochentag = wday(timestamp),
+				 stunde = hour(timestamp),
+				 ht_nt = ifelse(
+												(wochentag %in% c(1:5) & stunde %in% c(7:18)), 
+												"HT", 
+												"NT"),
+				 datum = as.Date(timestamp, "%Y%m%d", tz='Europe/Zurich')
+				) %>%
+	unique() %>% # da mehrere Datenlieferungen gleichzeitig im df landen
+	filter(timestamp>=format(as.Date("20230301", "%Y%m%d"))) %>%
+	group_by(datum,ht_nt) %>%
+	summarise(datum = unique(datum),
+						Wh_L1 = sum(Wh),
+						Wh_returned_L1 = sum(Wh_returned)
+						) %>%
+	ungroup()
+
+#####
+# L2
+#####
+
+df_kWh_ht_nt_L2 <- dat_L2 %>%
+				mutate(
+				 timestamp_utc = `Date/time UTC`,
+				 timestamp = as.POSIXct(format(timestamp_utc, tz='Europe/Zurich')),
+				 Wh = `Active energy Wh (C)`,
+				 Wh_returned = `Returned energy Wh (C)`,
+				 wochentag = wday(timestamp),
+				 stunde = hour(timestamp),
+				 ht_nt = ifelse(
+												(wochentag %in% c(1:5) & stunde %in% c(7:18)), 
+												"HT", 
+												"NT"),
+				 datum = as.Date(timestamp, "%Y%m%d", tz='Europe/Zurich')
+				) %>%
+	unique() %>% # da mehrere Datenlieferungen gleichzeitig im df landen
+	filter(timestamp>=format(as.Date("20230301", "%Y%m%d"))) %>%
+	group_by(datum,ht_nt) %>%
+	summarise(datum = unique(datum),
+						Wh_L2 = sum(Wh),
+						Wh_returned_L2 = sum(Wh_returned)
+						) %>%
+	ungroup()
+
+##########
+# L1, L2, L3 joinen auf datum und HT/NT
+##########
+
+# HT berechnen
+df_kWh_ht <- df_kWh_ht_nt_L0 %>%
+				left_join(df_kWh_ht_nt_L1, by=c('datum', 'ht_nt')) %>%
+				left_join(df_kWh_ht_nt_L2, by=c('datum', 'ht_nt')) %>%
+				filter(ht_nt == "HT") %>%
+				mutate(
+							 Wh_HT = Wh_L0+Wh_L1+Wh_L2,
+							 Wh_returned_HT = Wh_returned_L0+Wh_returned_L1+Wh_returned_L2,
+							 ht_nt = "HT")
+
+df_kWh_nt <- df_kWh_ht_nt_L0 %>%
+				left_join(df_kWh_ht_nt_L1, by=c('datum', 'ht_nt')) %>%
+				left_join(df_kWh_ht_nt_L2, by=c('datum', 'ht_nt')) %>%
+				filter(ht_nt == "NT") %>%
+				mutate(
+							 Wh_NT = Wh_L0+Wh_L1+Wh_L2,
+							 Wh_returned_NT = Wh_returned_L0+Wh_returned_L1+Wh_returned_L2,
+							 ht_nt = "NT")
+
+df_kWh_ht_nt <- df_kWh_ht %>%
+				full_join(df_kWh_nt, by = c('datum'))  %>%
+				arrange(datum) %>%
+				mutate(
+							 Wh_HT = replace_na(Wh_HT, 0),
+							 Wh_returned_HT = replace_na(Wh_returned_HT,0)
+							 )  %>% # es gibt Tage, wo kein HT-Strom tarifiert wird (Samstag/Sonntag)
+				# offset Zaehlerstand 28.02.2023 11644 kWh NT, 6348 kWh HT
+				mutate(
+							 HT_stand = round(cumsum(Wh_HT)/1000 + 6348 , digits=3),
+							 NT_stand = round(cumsum(Wh_NT)/1000 + 11644, digits=3),
+							 HT_stand_returned = round(cumsum(Wh_returned_HT)/1000, digits=3),
+							 NT_stand_returned = round(cumsum(Wh_returned_NT)/1000, digits=3)
+							 ) %>%
+				select(datum, HT_stand, NT_stand, HT_stand_returned, NT_stand_returned) %>%
+				arrange(desc(datum)) %>%
+  			write_tsv(file=paste(cachedirprefix, filedateprefix, "-zaehlerstande-strom_errechnet.csv", sep=""))
 
 if(FALSE){
 
