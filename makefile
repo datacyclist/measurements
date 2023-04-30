@@ -4,6 +4,9 @@ auswertung:
 wassertagesstaende:
 	cd script; Rscript -e "source('23-calculate-wasser-zaehlerstaende.R')"
 
+stromtagesstaende_deprecated:
+	cd script; Rscript -e "source('22-calculate-strom-zaehlerstaende-deprecated.R')"
+
 stromtagesstaende:
 	cd script; Rscript -e "source('22-calculate-strom-zaehlerstaende.R')"
 
