@@ -1,12 +1,11 @@
 ########################################
-# Skript zum Generieren von Verbrauchs-/Kosten-grafiken
+# Skript zum Generieren von Verbrauchs-/Kostengrafiken
 # 
-# 2021-03-18
+# 2023-04-30
 #
 # - Zählerstände aus CSV
 # - Berechnen von Zeitdifferenzen und Zählerdifferenzen für diese Zeiträume
-# - alles in (künstlichen) Stundenintervallen
-# - später Aggregation auf Tagesbasis, Monatsbasis
+# - Aggregation auf Tagesbasis, Monatsbasis
 # - Kosten müssen pro Jahr separat angepasst werden (siehe 08-grundpreise.R)
 # 
 ########################################
@@ -37,15 +36,15 @@ csvdirprefix <- '../csv/'
 
 
 # archivierte Ablesewerte aus dem Google-Sheet...
-dat1 <- read_csv(file=paste(csvdirprefix, "20210410-ablesewerte.csv", sep=""))
+# dat1 <- read_csv(file=paste(csvdirprefix, "20210410-ablesewerte.csv", sep=""))
 # ...und die aktuellen Ablesewerte
-dat2 <- read_tsv(file=paste(csvdirprefix, "ablesewerte-zum-eintragen.csv", sep=""))
+dat <- read_tsv(file=paste(csvdirprefix, "ablesewerte-zum-eintragen.csv", sep=""))
 
-# ...zusammenhängen (Reihenfolge von dat1 vorher an dat2 anpassen)
-dat <- dat1 %>%
-	select(timestamp,strom_tag, strom_nacht, gas, wasser, kommentar) %>%
-	rbind(dat2) %>%
-	arrange(timestamp)
+#dat <- dat2 
+#%>%
+#	select(timestamp,strom_tag, strom_nacht, gas, wasser, kommentar) %>%
+#	rbind(dat2) %>%
+#	arrange(timestamp)
 	
 
 ##############################
@@ -60,64 +59,64 @@ df_abgelesen_logical <- dat %>%
 	unique() %>% # bei mehrfachen Tagesablesungen
 	mutate(abgelesen_flag = TRUE)
 
-########################################
-cat(" Daten vorbearbeiten und bereinigen -- auf Stundenbasis runterbrechen \n")
-########################################
-
-df_hours <- dat %>%
-	mutate(
-				 diff_h = interval(lag(timestamp),timestamp)/hours(1),
-				 diff_gas = gas - lag(gas),
-				 diff_wasser = wasser - lag(wasser),
-				 diff_strom_ht = strom_tag-lag(strom_tag),
-				 diff_strom_nt = strom_nacht-lag(strom_nacht),
-				 verbrauch_gas_pro_stunde_kWh = diff_gas/diff_h*10.17,
-				 verbrauch_wasser_pro_stunde_l = diff_wasser/diff_h*1000,
-				 verbrauch_strom_ht_pro_stunde_kWh = diff_strom_ht/diff_h,
-				 verbrauch_strom_nt_pro_stunde_kWh = diff_strom_nt/diff_h,
-				 verbrauch_strom_gesamt_pro_stunde = verbrauch_strom_ht_pro_stunde_kWh + verbrauch_strom_nt_pro_stunde_kWh,
-				 timestamp_hours= format(timestamp, format = "%Y-%m-%d %H:00:00")
-				 )
-
-# join with this datedf in hours to fill missing values
-df_hours_for_join <- data.frame(
-															 timestamp_hours = seq.POSIXt(as.POSIXct(min(df_hours$timestamp,na.rm=TRUE)), 
-																														as.POSIXct(max(df_hours$timestamp, na.rm=TRUE)), 
-																														by="hour")
-															 ) %>%
-	mutate(timestamp_hours = format(timestamp_hours, format="%Y-%m-%d %H:00:00"))
-
-# Alles auf Stundenbasis berechnen...
-df_hours_join <- df_hours_for_join %>%
-				left_join(df_hours, by='timestamp_hours') %>%
-	fill(verbrauch_gas_pro_stunde_kWh, .direction='up') %>%
-	fill(verbrauch_wasser_pro_stunde_l, .direction='up') %>%
-	fill(verbrauch_strom_nt_pro_stunde_kWh, .direction='up') %>%
-	fill(verbrauch_strom_ht_pro_stunde_kWh, .direction='up') %>%
-	fill(verbrauch_strom_gesamt_pro_stunde, .direction='up')
+#########################################
+#cat(" Daten vorbearbeiten und bereinigen -- auf Stundenbasis runterbrechen \n")
+#########################################
+#
+#df_hours <- dat %>%
+#	mutate(
+#				 diff_h = interval(lag(timestamp),timestamp)/hours(1),
+#				 diff_gas = gas - lag(gas),
+#				 diff_wasser = wasser - lag(wasser),
+#				 diff_strom_ht = strom_tag-lag(strom_tag),
+#				 diff_strom_nt = strom_nacht-lag(strom_nacht),
+#				 verbrauch_gas_pro_stunde_kWh = diff_gas/diff_h*10.17,
+#				 verbrauch_wasser_pro_stunde_l = diff_wasser/diff_h*1000,
+#				 verbrauch_strom_ht_pro_stunde_kWh = diff_strom_ht/diff_h,
+#				 verbrauch_strom_nt_pro_stunde_kWh = diff_strom_nt/diff_h,
+#				 verbrauch_strom_gesamt_pro_stunde = verbrauch_strom_ht_pro_stunde_kWh + verbrauch_strom_nt_pro_stunde_kWh,
+#				 timestamp_hours= format(timestamp, format = "%Y-%m-%d %H:00:00")
+#				 )
+#
+## join with this datedf in hours to fill missing values
+#df_hours_for_join <- data.frame(
+#															 timestamp_hours = seq.POSIXt(as.POSIXct(min(df_hours$timestamp,na.rm=TRUE)), 
+#																														as.POSIXct(max(df_hours$timestamp, na.rm=TRUE)), 
+#																														by="hour")
+#															 ) %>%
+#	mutate(timestamp_hours = format(timestamp_hours, format="%Y-%m-%d %H:00:00"))
+#
+## Alles auf Stundenbasis berechnen...
+#df_hours_join <- df_hours_for_join %>%
+#				left_join(df_hours, by='timestamp_hours') %>%
+#	fill(verbrauch_gas_pro_stunde_kWh, .direction='up') %>%
+#	fill(verbrauch_wasser_pro_stunde_l, .direction='up') %>%
+#	fill(verbrauch_strom_nt_pro_stunde_kWh, .direction='up') %>%
+#	fill(verbrauch_strom_ht_pro_stunde_kWh, .direction='up') %>%
+#	fill(verbrauch_strom_gesamt_pro_stunde, .direction='up')
 
 # ...und wieder auf Tagesbasis aggregieren
 
-df_days <- df_hours_join %>%
-				mutate(
-							 timestamp_day = format(as.POSIXct(timestamp_hours, format = "%Y-%m-%d %H:%M:%S"), format="%Y-%m-%d")
-				) %>%
-	group_by(timestamp_day) %>%
-	summarise(
-						verbrauch_gas_pro_tag_kWh = round(sum(verbrauch_gas_pro_stunde_kWh, na.rm=TRUE),digits=3),
-						verbrauch_wasser_pro_tag_l = sum(verbrauch_wasser_pro_stunde_l, na.rm=TRUE),
-						verbrauch_wasser_pro_tag_l = round(ifelse(verbrauch_wasser_pro_tag_l < 0, 0, verbrauch_wasser_pro_tag_l),digits=1),
-						verbrauch_strom_ht_pro_tag_kWh = round(sum(verbrauch_strom_ht_pro_stunde_kWh, na.rm=TRUE),digits=3),
-						verbrauch_strom_nt_pro_tag_kWh = round(sum(verbrauch_strom_nt_pro_stunde_kWh, na.rm=TRUE),digits=3),
-						verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh) %>%
-	ungroup()  %>%
+df_days <- dat %>%
+		arrange(timestamp) %>%
+		mutate(
+						verbrauch_strom_ht_pro_tag_kWh = round(strom_tag-lag(strom_tag),digits=3),
+						verbrauch_strom_nt_pro_tag_kWh = round(strom_nacht-lag(strom_nacht),digits=3),
+						verbrauch_gas_pro_tag_kWh = round((gas-lag(gas))*10.17,digits=3),
+						verbrauch_wasser_pro_tag_l = round((wasser-lag(wasser))*1000,digits=3),
+						verbrauch_strom_gesamt_pro_tag = verbrauch_strom_ht_pro_tag_kWh + verbrauch_strom_nt_pro_tag_kWh
+		) %>%
+	mutate(
+				 timestamp_day = as.character(as.Date(timestamp)),
+				 datum = as.Date(timestamp)
+				 ) %>%
 	left_join(df_abgelesen_logical, by='timestamp_day') %>%
-	#mutate(datum = as.Date(format(timestamp_day, format="%Y-%m-%d", tz='Europe/Zurich'))) %>%
-	mutate(datum = as.Date(timestamp_day)) %>%
-				 #, format="%Y-%m-%d")) %>%
 	mutate(abgelesen_flag = replace_na(abgelesen_flag, FALSE))
-
-w1 <- write_csv2(x=df_days, file=paste(cachedirprefix, "dfdays.csv" , sep =""))
+	
+#	#mutate(datum = as.Date(format(timestamp_day, format="%Y-%m-%d", tz='Europe/Zurich'))) %>%
+#				 #, format="%Y-%m-%d")) %>%
+#
+#w1 <- write_csv2(x=df_days, file=paste(cachedirprefix, "dfdays.csv" , sep =""))
 	
 ########################################
 # Tage pro Monat -- nicht immer 30...
@@ -167,7 +166,7 @@ dfplot <- df1 %>%
 		)
 
 verbrauchsplot <- ggplot(dfplot) +
-	geom_col(aes(x=datum, y=value, group=variable, fill=variable, color=abgelesen_colour), position='stack', size=0.3) +
+	geom_col(aes(x=datum, y=value, group=variable, fill=variable), position='stack', size=1) +
 	scale_colour_identity() +
 	scale_fill_brewer(type='qual', palette='Set2', direction=1) +
 	facet_wrap(~group, ncol=1, scales='free_y') +
@@ -399,7 +398,7 @@ kostenplot <- ggplot(dfplot2) +
 	scale_colour_identity() +
 	#annotate("text", x=min(dfplot2$datum), y=1000, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
 	#annotate("text", x=min(dfplot2$datum), y=950, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
-	scale_y_continuous(limits=c(0,1000)) +
+	#scale_y_continuous(limits=c(0,1000)) +
 	scale_fill_brewer(type='div') +
 	#scale_fill_brewer(type='div', palette='Set2') +
 	theme_verbrauch() +
@@ -436,7 +435,7 @@ kostenplot_30days <- ggplot(dfplot2_30days) +
 	scale_colour_identity() +
 	#annotate("text", x=min(dfplot2$datum), y=1000, hjust=0, cex=5, label='- Balken ohne Umrandung = interpoliert, nicht abgelesen') +
 	#annotate("text", x=min(dfplot2$datum), y=950, hjust=0, cex=5, label='- Balken = Werte von vorheriger Ablesung bis "Balkendatum"') +
-	scale_y_continuous(limits=c(0,1000)) +
+	#scale_y_continuous(limits=c(0,1000)) +
 	scale_fill_brewer(type='div') +
 	#scale_fill_brewer(type='div', palette='Set2') +
 	theme_verbrauch() +
@@ -608,7 +607,7 @@ kostenplot3 <- ggplot(dfplot4) +
 	geom_col(aes(x=quartal, y=value_Fr, group=variable, fill=variable), colour='black', position='stack', size=0.3) +
 	#scale_colour_identity() +
 	#facet_wrap(~group, ncol=1, scales='free_y') +
-	geom_text(data=dfplot4_ann, aes(x=quartal, y=(summe_kosten/100)+5,label=round(summe_kosten/100, digits=2)), cex=5) +
+	geom_text(data=dfplot4_ann, aes(x=quartal, y=(summe_kosten/100)+10,label=round(summe_kosten/100, digits=2)), cex=5) +
 	theme_verbrauch() +
 	theme(axis.text.x=element_text(angle=90)) +
 	labs(title="Verbrauchskosten OD10 gesamt, Quartale (inkl. Abwasser)",
