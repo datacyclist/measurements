@@ -42,14 +42,14 @@ dat1 <- read_csv(file=paste(csvdirprefix, "20210410-ablesewerte.csv", sep=""))
 dat2 <- read_tsv(file=paste(csvdirprefix, "ablesewerte-zum-eintragen.csv", sep=""))
 
 # ...zusammenhängen (Reihenfolge von dat1 vorher an dat2 anpassen)
-dat <- dat1 %>%
-	select(timestamp,strom_tag, strom_nacht, gas, wasser, kommentar) %>%
-	rbind(dat2) %>%
-	arrange((timestamp)) %>%
-	mutate(tag = as.Date(timestamp),
-				 gas_kWh = gas*10.17) %>%
-	select(tag, gas_kWh) %>%
-	mutate(diff_gas = gas_kWh-lag(gas_kWh))
+# dat <- dat1 %>%
+# 	select(timestamp,strom_tag, strom_nacht, gas, wasser, kommentar) %>%
+# 	rbind(dat2) %>%
+# 	arrange((timestamp)) %>%
+# 	mutate(tag = as.Date(timestamp),
+# 				 gas_kWh = gas*10.17) %>%
+# 	select(tag, gas_kWh) %>%
+# 	mutate(diff_gas = gas_kWh-lag(gas_kWh))
 
 # genauere Werte ab 27.05. -- Ablesefrequenz verdoppelt
 	
@@ -57,28 +57,27 @@ dat <- dat1 %>%
 # Daten aus Gastherme-Log holen
 ##############################
 
-dft <- list.files(path="/home/russ/mnt/nas/zaehlerlog/gastherme/", pattern="20230.*optolinklog.csv", full.names=TRUE) %>%
-			map_df(~read_delim(.,delim=" ", 
-								 col_types = cols(.default = col_character()),
-												 col_names=FALSE))
+dft <- list.files(path="/home/russ/mnt/nas/zaehlerlog/gastherme/", pattern="20230[2|3|4].*optolinklog.csv", full.names=TRUE) %>%
+			map_df(~read_delim(.,delim=" ", col_types = cols(.default = col_character()), col_names=FALSE))
 
 dftherme <- dft %>%
-				select(X1,X19,X25,X29,X27) %>%
 				arrange(X1) %>%
-				mutate(timestamp=as.POSIXct(as.numeric(X1), origin="1970-01-01", tz="Europe/Zurich"),
-							 unix_ts = X1,
-							 X1=NULL,
-							 brennerstunden=as.numeric(X29),
-						 diff_brennerstunden_s = (brennerstunden-lag(brennerstunden))*3600,
-							 X19=NULL,
-						 # brennerleistung ist in % der maximalen Leistung?
+				mutate(
+							 timestamp=as.POSIXct(as.numeric(X1), origin="1970-01-01", tz="Europe/Zurich"),
 							 brennerleistung_prozent=as.numeric(X25),
+							 brennerstarts = as.numeric(X26),
+							 brennerstunden=as.numeric(X29), 
+							 unix_ts = X1,
+						 	 diff_brennerstunden_s = (brennerstunden-lag(brennerstunden))*60*60,
+						 # brennerleistung ist in % der maximalen Leistung?
 							 brennerleistung_kW = brennerleistung_prozent/100 * 16,
 							 #X21=NULL,
 				       diff_s = interval(lag(timestamp),timestamp)/hours(1)*3600,
-							 Wh_grob = diff_s * brennerleistung_kW*1000 / 3600,
 
-							 brennerstarts = as.numeric(X27),
+							 #Wh_grob = diff_brennerstunden_s * brennerleistung_kW*1000 / 3600,
+							 Wh_grob_timelag = diff_s * brennerleistung_kW*1000 / 3600,
+							 Wh_grob = diff_brennerstunden_s * brennerleistung_kW*1000 / 3600,
+
 							 brennerstarts_pro_zeitraum = replace_na(brennerstarts-lag(brennerstarts),0),
 
 							 # moegliche Korrektur mittels Brennerdauer?
@@ -98,7 +97,7 @@ dftag_therme <- dftherme %>%
 									verbrauch_m3_therme = verbrauch_kWh_grob/10.17,
 									anz_brennerstarts=sum(brennerstarts_pro_zeitraum),
 									anz_zeilen = n(),
-									verbrauch_m3_therme_korrigiert = verbrauch_m3_therme*0.90,
+									#verbrauch_m3_therme_korrigiert = verbrauch_m3_therme*0.90,
 									verbrauch_kWh_therme_korrigiert = verbrauch_kWh_grob*0.90
 									#verbrauch_kWh_korrigiert = sum(Wh_korrigiert, na.rm=TRUE)/1000
 									)
@@ -123,7 +122,7 @@ dfverbraeuche <- tagverbrauch %>%
 ##############################
 
 corrplot <- ggplot(dfverbraeuche) +
-	geom_point(aes(x=verbrauch_kWh_therme_korrigiert, y=verbrauch_kWh_zaehler,colour=anz_brennerstarts),  size=3.5,  alpha=0.85) +
+	geom_point(aes(x=verbrauch_kWh_therme_korrigiert, y=verbrauch_kWh_zaehler),  size=3.5,  alpha=0.85) +
 	#geom_text(aes(x=verbrauch_kWh_therme_korrigiert, y=verbrauch_kWh_zaehler,label=tag),  size=6, colour="black", alpha=0.75, hjust=0) +
 	#scale_colour_identity() +
 	scale_fill_brewer(type='div', direction=1) +
