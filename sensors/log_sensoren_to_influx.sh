@@ -11,8 +11,8 @@ API_KEY_TS=`cat thingspeak_apikey`
 ########################################
 
 # Daten von Sensor holen
-MESSWERTEAUSSEN=`./get_sensor_bmp085.py`
-MESSWERTEKELLER=`./get_sensor_DS18B20.py`
+# MESSWERTEAUSSEN=`./get_sensor_bmp085.py`
+# MESSWERTEKELLER=`./get_sensor_DS18B20.py`
 
 # Daten von powermeter-A/C im Estrich holen
 energytoday=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
@@ -41,6 +41,9 @@ humbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusS
 tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
 humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
 dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.DewPoint'`
+
+# tasmota im Keller fuer Aussentemperatur Suedseite
+temperature_sth=`curl -s -X GET http://192.168.0.83/cm?cmnd=Status%208 | jq -r '.StatusSNS .DS18B20.Temperature'`
 
 # Daten von sonoff powermeter am Solarpanel auf Kellerplatte holen
 energy_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
@@ -94,6 +97,8 @@ TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
 HUMESTRICH=`echo humidity_estrich value=$humestrich`
 DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
 
+TEMPSOUTH=`echo temperature_sth value=$temperature_sth`
+
 SOLARENERGY=`echo SOLAR_ENERGY_TODAY_kWh value=$energy_solar`
 SOLARPOWER=`echo SOLAR_power value=$power_solar`
 # SOLARVOLTAGE=`echo SOLAR_voltage value=$voltage_solar`
@@ -106,12 +111,9 @@ SOLARPOWER_VERTICAL=`echo SOLAR_power_vertical value=$power_solar_vertical`
 #echo $SOLARENERGY
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBUERO $HUMBUERO $TEMPBETT $HUMBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
-#MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARVOLTAGE $SOLARCURRENT $SOLARFACTOR $SOLARENERGY $TEMPBUERO $TEMPBETT`
-#MESSWERTE=`echo $MESSWERTEAUSSEN $MESSWERTEKELLER $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $TEMPBUERO $TEMPBETT`
-#
+MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBUERO $HUMBUERO $TEMPBETT $HUMBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH $TEMPSOUTH`
 
-#echo $MESSWERTE
+echo $MESSWERTE
 
 
 # Messwertzeilen durch \n getrennt
