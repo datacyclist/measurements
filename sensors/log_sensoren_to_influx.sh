@@ -42,8 +42,8 @@ tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.Sta
 humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
 dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.DewPoint'`
 
-# tasmota im Keller fuer Aussentemperatur Suedseite
-temperature_sth=`curl -s -X GET http://192.168.0.83/cm?cmnd=Status%208 | jq -r '.StatusSNS .DS18B20.Temperature'`
+# tasmota im Keller fuer Aussentemperatur Suedseite (kommt jetzt via MQTT teleperiod auf tasmota)
+# temperature_sth=`curl -s -X GET http://192.168.0.83/cm?cmnd=Status%208 | jq -r '.StatusSNS .DS18B20.Temperature'`
 
 # Daten von sonoff powermeter am Solarpanel auf Kellerplatte holen
 energy_solar=`curl -s -X GET http://192.168.0.78/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`
@@ -97,7 +97,7 @@ TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
 HUMESTRICH=`echo humidity_estrich value=$humestrich`
 DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
 
-TEMPSOUTH=`echo temperature_sth value=$temperature_sth`
+# TEMPSOUTH=`echo temperature_sth value=$temperature_sth`
 
 SOLARENERGY=`echo SOLAR_ENERGY_TODAY_kWh value=$energy_solar`
 SOLARPOWER=`echo SOLAR_power value=$power_solar`
@@ -111,7 +111,7 @@ SOLARPOWER_VERTICAL=`echo SOLAR_power_vertical value=$power_solar_vertical`
 #echo $SOLARENERGY
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBUERO $HUMBUERO $TEMPBETT $HUMBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH $TEMPSOUTH`
+MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBUERO $HUMBUERO $TEMPBETT $HUMBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
 
 echo $MESSWERTE
 
@@ -145,13 +145,13 @@ curl -s -i -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write
 # vorher 20s warten -- thingspeak erlaubt nur updates alle 15s und der host
 # raspberryiot sendet auch minütlich
 
-sleep 30s
+# sleep 30s
 
 #echo $MESSWERTEAUSSEN
-TEMPERATUR_SUEDSEITE=`echo $MESSWERTEAUSSEN | sed 's/.*temperature_sth\svalue=\(-*[0-9]*[0-9].[0-9]\).*air.*/\1/'`
+# TEMPERATUR_SUEDSEITE=`echo $MESSWERTEAUSSEN | sed 's/.*temperature_sth\svalue=\(-*[0-9]*[0-9].[0-9]\).*air.*/\1/'`
 #echo $TEMPERATUR_SUEDSEITE
 
-LUFTDRUCK=`echo $MESSWERTEAUSSEN | sed 's/.*airpressure\svalue=\([0-9]*[0-9][0-9][0-9].[0-9]\).*/\1/'`
+# LUFTDRUCK=`echo $MESSWERTEAUSSEN | sed 's/.*airpressure\svalue=\([0-9]*[0-9][0-9][0-9].[0-9]\).*/\1/'`
 #echo $LUFTDRUCK
 
 #TEMPERATUR_WARMWASSER=`echo $MESSWERTE | sed 's/.*getTempWWist.value\s\(-*[0-9][0-9].[0-9]\).*getTempWWsoll.*/\1/'`
@@ -159,9 +159,9 @@ LUFTDRUCK=`echo $MESSWERTEAUSSEN | sed 's/.*airpressure\svalue=\([0-9]*[0-9][0-9
 
 #TEMPERATUR_HWR=`cat /var/tmp/bmp280_temperature`
 
-curl -X GET -G https://api.thingspeak.com/update \
- 	-d "api_key=$API_KEY_TS" \
- 	-d "field4=$TEMPERATUR_SUEDSEITE" \
- 	-d "field5=$LUFTDRUCK" \
-     	--header "Content-type: application/x-www-form-urlencoded" \
-  	--header "Accept: text/plain"
+# curl -X GET -G https://api.thingspeak.com/update \
+#  	-d "api_key=$API_KEY_TS" \
+#  	-d "field4=$TEMPERATUR_SUEDSEITE" \
+#  	-d "field5=$LUFTDRUCK" \
+#      	--header "Content-type: application/x-www-form-urlencoded" \
+#   	--header "Accept: text/plain"
