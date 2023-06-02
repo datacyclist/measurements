@@ -13,11 +13,10 @@ CSVDATA=`curl -s -k --request POST \
    from(bucket: "od10_messwerte")
 	  |> range(start: -2m)
 		|> truncateTimeColumn(unit: 1m)
-    |> filter(fn: (r) => r["_measurement"] == "getTempA" or r["_measurement"] == "temperature_sth" )
-		|> lowestMin(
-		    n:1,
-			 column: "_value",
-			 groupColumns: [])
+		|> filter(fn: (r) => r._measurement == "temperature" or r._measurement == "getTempA")
+		|> filter(fn: (r) => r._field == "temperature_sth" or r._field == "value")
+		|> last()
+		|> lowestMin(n: 1, column: "_value", groupColumns: [])    
 		'
 		`
 
