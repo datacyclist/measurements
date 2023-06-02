@@ -1,0 +1,14 @@
+[Unit]
+Description=Wechselrichter-Logger
+After=multi-user.target
+
+[Service]
+Type=simple
+User=russ
+Restart=always
+WorkingDir=/home/russ/bin/SunGather/SunGather
+ExecStart=/usr/local/bin/python3.11 /home/russ/bin/SunGather/SunGather/sungather.py -c /home/russ/bin/SunGather/SunGather/config.yaml -r /home/russ/bin/SunGather/SunGather/registers-sungrow.yaml
+#ExecStart=/usr/bin/python3 /home/<username>/test.py
+
+[Install]
+WantedBy=multi-user.target
