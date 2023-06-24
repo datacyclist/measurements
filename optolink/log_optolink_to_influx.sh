@@ -12,7 +12,7 @@ FILEDATE=`date +"%Y%m%d"`
 # Daten von Heizung abholen, alles auf einmal :-)
 MESSWERTE=`/usr/bin/vclient -h 127.0.0.1:3002 -m -c 'getTempWWist,getTempWWsoll,\
 getTempKist,getTempAged,getTempA,getTempAbgas,\
-getTempSpu,getTempVListM1,getTempVLsollM1,\
+getTempVListM1,getTempVLsollM1,\
 getBetriebArt,getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
 getPumpeStatusM1,getPumpeDrehzahlIntern,getPumpeStatusIntern,\
 getTempRaumNorSollM1,getUmschaltventil,getTempRL17A'`
@@ -30,19 +30,30 @@ getTempRaumNorSollM1,getUmschaltventil,getTempRL17A'`
 # Messwertzeilen durch \n getrennt
 
 # echo "reformatting\n"
-MESS=`echo $MESSWERTE | sed 's/ get/\nget/g;s/.value\ / value=/g' `
-
+MESS=`echo $MESSWERTE | sed 's/.value\ / value=/g'`
 #echo $MESS
+MESS1=`echo $MESS | sed 's/getTemp\([a-zA-Z0-9]*\) value=/temperature \1=/g;s/=\([0-9.]*\) /=\1\n/g' `
+#echo $MESS1 > /home/russ/tmp/log.txt
+
+
+#echo $TIMESTAMP
+#MESS2=`echo $MESS1 | sed 's/ get/\nget/g' `
+#echo $MESS2
+
+#echo $MESS1 > /home/russ/tmp/log.txt
 # such a mess...
 
+#LOGCONTENT=`echo $MESS1 $TIMESTAMP`
+
+#echo $LOGCONTENT
 # echo "posting to influx\n"
 ##############################
 # Daten in influxdb POSTen
 ##############################
 
 curl -k -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=ms"\
-	          --header "Authorization: Token $INFLUX_TOKEN"\
-            --data-raw "$MESS"
+ 	          --header "Authorization: Token $INFLUX_TOKEN"\
+             --data-raw "$MESS1"
 
 # (curl ohne Zertifikatprüfung: -k)
 
