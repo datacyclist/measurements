@@ -36,10 +36,10 @@ JAHR=$(date '+%Y')
 for MAX_PREFIX in "${thermostate[@]}"
 do
 	#MAX_PREFIX='MAX_0090bf'
-	#echo $MAX_PREFIX
+	echo $MAX_PREFIX
 	
-	LOGSNIPPET=`tail -n 8 /opt/fhem/log/$MAX_PREFIX-$JAHR.log`
-	#echo "$LOGSNIPPET"
+	LOGSNIPPET=`tail -n 14 /opt/fhem/log/$MAX_PREFIX-$JAHR.log`
+	echo "$LOGSNIPPET"
 	
 	# wichtig: für den Timestamp muss eine Herkunfts-Zeitzone angegeben
 	# werden -- ansonsten macht dconv daraus einen UNIX-Epoch-Timestamp in
@@ -84,7 +84,8 @@ do
 
 done
 
-# echo $CURL_INFLUX_LOG
+
+echo $CURL_INFLUX_LOG
 
 # So, jetzt alles nach InfluxDB abkippen, friss und stirb :-)
 # (curl ohne Zertifikat-Pruefung: -k)
