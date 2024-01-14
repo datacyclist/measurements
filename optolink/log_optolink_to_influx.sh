@@ -6,18 +6,27 @@
 INFLUX_TOKEN=`cat influx_token`
 #echo $API_KEY_TS
 
-TIMESTAMP=`date +"%s"`
+TIMESTAMP=`date +"%s%3N"`
 FILEDATE=`date +"%Y%m%d"`
+
+#echo $TIMESTAMP
 
 # Daten von Heizung abholen, alles auf einmal :-)
 MESSWERTE=`/usr/bin/vclient -h 127.0.0.1:3002 -m -c 'getTempWWist,getTempWWsoll,\
-getTempKist,getTempAged,getTempA,getTempAbgas,\
-getTempVListM1,getTempVLsollM1,\
-getBetriebArt,getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
-getPumpeStatusM1,getPumpeDrehzahlIntern,getPumpeStatusIntern,\
+getTempKist,getTempAged,\
+getTempVListM1,\
+getTempVLsollM1,\
+getTempA,\
+getBetriebArt,\
+getVolStrom,getBrennerStatus,getBrennerStarts,getBrennerStunden1,getLeistungIst,\
+getTempAbgas,\
+getPumpeStatusM1,\
+getPumpeDrehzahlIntern,getPumpeStatusIntern,\
 getTempRaumNorSollM1,getUmschaltventil,getTempRL17A'`
 
 #echo $MESSWERTE
+
+#echo "\n"
 
 # umformatieren
 
@@ -32,9 +41,11 @@ getTempRaumNorSollM1,getUmschaltventil,getTempRL17A'`
 # echo "reformatting\n"
 MESS=`echo $MESSWERTE | sed 's/.value\ / value=/g'`
 #echo $MESS
-MESS1=`echo $MESS | sed 's/getTemp\([a-zA-Z0-9]*\) value=/temperature \1=/g;s/=\([0-9.]*\) /=\1\n/g' `
+#echo "----"
+MESS1=`echo $MESS | sed 's/getTemp\([a-zA-Z0-9]*\) value=/temperature \1=/g;s/=\([-]*[0-9.]*\) /=\1\n/g' `
 #echo $MESS1 > /home/russ/tmp/log.txt
 
+#echo $MESS1
 
 #echo $TIMESTAMP
 #MESS2=`echo $MESS1 | sed 's/ get/\nget/g' `
@@ -43,18 +54,22 @@ MESS1=`echo $MESS | sed 's/getTemp\([a-zA-Z0-9]*\) value=/temperature \1=/g;s/=\
 #echo $MESS1 > /home/russ/tmp/log.txt
 # such a mess...
 
-#LOGCONTENT=`echo $MESS1 $TIMESTAMP`
+printf "$MESS1 $TIMESTAMP" > /tmp/influxpost.txt
 
-#echo $LOGCONTENT
+#echo $LOGCONTENT | tr -d '\n'
 # echo "posting to influx\n"
 ##############################
 # Daten in influxdb POSTen
 ##############################
+#echo "---"
+#curl -k -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=ms"\
 
-curl -k -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=ms"\
+curl -k -s -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte"\
  	          --header "Authorization: Token $INFLUX_TOKEN"\
-             --data-raw "$MESS1"
+						--data-binary @/tmp/influxpost.txt
 
+						#--data-raw "temperature A=5\ntemperature B=7\ntemperature C=-2.5\n1705248127821"
+#            --data-raw "$MESS1"
 # (curl ohne Zertifikatprüfung: -k)
 
 ##############################
