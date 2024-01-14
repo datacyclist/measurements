@@ -29,18 +29,18 @@ current=`curl -s -X GET http://192.168.0.77/cm?cmnd=Status%208 | jq -r '.StatusS
 # I love bc :-) Leistung A/C berechnen
 power=`echo "$factor*$voltage*$current" | bc`
 
-# tasmota im Buero
-tempbuero=`curl -s -X GET http://192.168.0.75/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
-humbuero=`curl -s -X GET http://192.168.0.75/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
+# # tasmota im Buero
+# tempbuero=`curl -s -X GET http://192.168.0.75/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
+# humbuero=`curl -s -X GET http://192.168.0.75/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
 
 # tasmota im Schlafzimmer
 tempbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
 humbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
 
 # tasmota Estrich
-tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
-humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
-dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.DewPoint'`
+# tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
+# humestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
+# dewpointestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.DewPoint'`
 
 # tasmota im Keller fuer Aussentemperatur Suedseite (kommt jetzt via MQTT teleperiod auf tasmota)
 # temperature_sth=`curl -s -X GET http://192.168.0.83/cm?cmnd=Status%208 | jq -r '.StatusSNS .DS18B20.Temperature'`
@@ -87,15 +87,15 @@ ACENERGY=`echo AC_energytoday value=$energytoday`
 #echo $ACENERGY
 #echo "test"
 
-TEMPBUERO=`echo temperature_buero value=$tempbuero`
-HUMBUERO=`echo humidity_buero value=$humbuero`
+# TEMPBUERO=`echo temperature_buero value=$tempbuero`
+# HUMBUERO=`echo humidity_buero value=$humbuero`
 
 TEMPBETT=`echo temperature_bett value=$tempbett`
 HUMBETT=`echo humidity_bett value=$humbett`
 
-TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
-HUMESTRICH=`echo humidity_estrich value=$humestrich`
-DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
+# TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
+# HUMESTRICH=`echo humidity_estrich value=$humestrich`
+# DEWPOINTESTRICH=`echo dewpoint_estrich value=$dewpointestrich`
 
 # TEMPSOUTH=`echo temperature_sth value=$temperature_sth`
 
@@ -111,7 +111,7 @@ SOLARPOWER_VERTICAL=`echo SOLAR_power_vertical value=$power_solar_vertical`
 #echo $SOLARENERGY
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBUERO $HUMBUERO $TEMPBETT $HUMBETT $TEMPESTRICH $HUMESTRICH $DEWPOINTESTRICH`
+MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBETT $HUMBETT`
 
 echo $MESSWERTE
 
