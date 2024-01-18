@@ -6,7 +6,7 @@
 INFLUX_TOKEN=`cat influx_token`
 #echo $API_KEY_TS
 
-TIMESTAMP=`date +"%s%3N"`
+TIMESTAMP=`date +"%s%N"`
 FILEDATE=`date +"%Y%m%d"`
 
 #echo $TIMESTAMP
@@ -54,8 +54,8 @@ MESS1=`echo $MESS | sed 's/getTemp\([a-zA-Z0-9]*\) value=/temperature \1=/g;s/=\
 #echo $MESS1 > /home/russ/tmp/log.txt
 # such a mess...
 
-#printf "$MESS1 $TIMESTAMP" > /tmp/influxpost.txt
-printf "$MESS1" > /tmp/influxpost.txt
+printf "$MESS1 $TIMESTAMP" > /tmp/influxpost.txt
+#printf "$MESS1" > /tmp/influxpost.txt
 
 #echo $LOGCONTENT | tr -d '\n'
 # echo "posting to influx\n"
