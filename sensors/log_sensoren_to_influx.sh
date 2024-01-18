@@ -34,8 +34,8 @@ power=`echo "$factor*$voltage*$current" | bc`
 # humbuero=`curl -s -X GET http://192.168.0.75/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
 
 # tasmota im Schlafzimmer
-tempbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
-humbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
+# tempbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
+# humbett=`curl -s -X GET http://192.168.0.76/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Humidity'`
 
 # tasmota Estrich
 # tempestrich=`curl -s -X GET http://192.168.0.74/cm?cmnd=Status%208 | jq -r '.StatusSNS.SI7021.Temperature'`
@@ -90,8 +90,8 @@ ACENERGY=`echo AC_energytoday value=$energytoday`
 # TEMPBUERO=`echo temperature_buero value=$tempbuero`
 # HUMBUERO=`echo humidity_buero value=$humbuero`
 
-TEMPBETT=`echo temperature_bett value=$tempbett`
-HUMBETT=`echo humidity_bett value=$humbett`
+# TEMPBETT=`echo temperature_bett value=$tempbett`
+# HUMBETT=`echo humidity_bett value=$humbett`
 
 # TEMPESTRICH=`echo temperature_estrich value=$tempestrich`
 # HUMESTRICH=`echo humidity_estrich value=$humestrich`
@@ -111,9 +111,9 @@ SOLARPOWER_VERTICAL=`echo SOLAR_power_vertical value=$power_solar_vertical`
 #echo $SOLARENERGY
 
 # alle Messwerte hintereinander
-MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL $TEMPBETT $HUMBETT`
+MESSWERTE=`echo $ACPOWER $ACVOLTAGE $ACCURRENT $ACFACTOR $ACENERGY $SOLARPOWER $SOLARENERGY $SOLARPOWER_VERTICAL $SOLARENERGY_VERTICAL`
 
-echo $MESSWERTE
+# echo $MESSWERTE
 
 
 # Messwertzeilen durch \n getrennt
