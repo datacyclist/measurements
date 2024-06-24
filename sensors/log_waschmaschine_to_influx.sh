@@ -19,7 +19,7 @@ factor_waschmaschine=`curl -s -X GET http://192.168.0.81/cm?cmnd=Status%208 | jq
 voltage_waschmaschine=`curl -s -X GET http://192.168.0.81/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current_waschmaschine=`curl -s -X GET http://192.168.0.81/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
 
-# I love bc :-) Leistung Therme berechnen
+# I love bc :-) Leistung Waschmaschine berechnen
 power_waschmaschine=`echo "$factor_waschmaschine*$voltage_waschmaschine*$current_waschmaschine" | bc`
 
 ##############################
@@ -39,7 +39,7 @@ MESSWERTE+=$(printf '%s' "$WASCHMASCHINEVOLTAGE")$' '$(printf '%u' "$TS")$'\n'
 MESSWERTE+=$(printf '%s' "$WASCHMASCHINECURRENT")$' '$(printf '%u' "$TS")$'\n'
 MESSWERTE+=$(printf '%s' "$WASCHMASCHINEFACTOR")$' '$(printf '%u' "$TS")$'\n'
 
-echo $MESSWERTE
+#echo $MESSWERTE
 
 # Attention: precision of timestamp is specified in the POST request
 
