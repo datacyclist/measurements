@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# script läuft per crontab auf host smartmeter
+# script läuft auf host vpnhole minütlich in crontab                                                                                        
+* * * * * cd ~/bin/measurements/sensors && ../log_waschmaschine_to_influx.sh
+
 # Leistungswerte der Waschmaschine nach influxDB loggen
 
 # influx token in File ablegen, wird nicht mit abgelegt im GIT

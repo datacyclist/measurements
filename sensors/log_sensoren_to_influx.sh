@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# script läuft auf host smartmeter
+# script läuft auf host vpnhole minütlich in crontab                                                                                        
+* * * * * cd ~/bin/measurements/sensors && ../log_sensoren_to_influx.sh
 
 # influx token in File ablegen, wird nicht mit abgelegt im GIT
 INFLUX_TOKEN=`cat influx_token`
