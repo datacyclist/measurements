@@ -29,7 +29,16 @@ factor_quooker=`curl -s -X GET http://192.168.0.82/cm?cmnd=Status%208 | jq -r '.
 voltage_quooker=`curl -s -X GET http://192.168.0.82/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Voltage'`
 current_quooker=`curl -s -X GET http://192.168.0.82/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Current'`
 
-# I love bc :-) Leistung Quooker berechnen
+quookerenergytoday=`curl -s -X GET http://192.168.0.82/cm?cmnd=Status%208 | jq -r '.StatusSNS.ENERGY.Today'`                                                                                                              
+# Tagesverbrauch kann auch N/A sein, dann auf 0 setzen                                                                                                                                                             
+if [ -z "$quookerenergytoday" ]
+then
+	quookerenergytoday=0
+fi
+
+QUOOKERENERGY=`echo QUOOKER_energytoday value=$quookerenergytoday`
+
+# Leistung Quooker berechnen
 power_quooker=`echo "$factor_quooker*$voltage_quooker*$current_quooker" | bc`
 
 ##############################
@@ -67,4 +76,4 @@ MESSWERTEQ+=$(printf '%s' "$QUOOKERFACTOR")$' '$(printf '%u' "$TS")$'\n'
 # Daten in influxdb POSTen
 curl -s -i -XPOST "https://eu-central-1-1.aws.cloud2.influxdata.com/api/v2/write?org=influx@georgruss.ch&bucket=od10_messwerte&precision=s"\
 	          --header "Authorization: Token $INFLUX_TOKEN"\
-            --data-raw "$MESSWERTE $MESSWERTEQ"
+            --data-raw "$MESSWERTE $MESSWERTEQ $QUOOKERENERGY"
